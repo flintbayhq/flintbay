@@ -92,7 +92,7 @@ services:
 
       ## ─── Retention, push, and observability ───────────────────────────
       # RCH_AUDIT_RETENTION_DAYS: "90"
-      # RCH_INTEGRATION_LOG_RETENTION_DAYS: "7"
+      # RCH_CONNECTION_LOG_RETENTION_DAYS: "7"
       # RCH_SYSTEM_LOG_RETENTION_DAYS: "30"
       # RCH_VAPID_PUBLIC_KEY: ""
       # RCH_VAPID_PRIVATE_KEY: ""

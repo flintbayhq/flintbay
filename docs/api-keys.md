@@ -22,13 +22,13 @@ The key format: `rch_pat_<random>` (prefix `rch_pat_` identifies it as an RCH to
 ### Detailed Scopes
 
 **read-only** includes:
-`screen:view`, `page:view`, `widget:view`, `binding:view`, `endpoint:view`, `source:view`, `audit_log:view`, `integration_log:view`, `member:view`
+`screen:view`, `page:view`, `widget:view`, `binding:view`, `endpoint:view`, `source:view`, `audit_log:view`, `connection_log:view`, `member:view`
 
 **dashboard** adds:
 `screen:create/update/delete`, `page:create/update/delete`, `widget:create/update/delete/interact`, `binding:create/update/delete`, `endpoint:create/update/delete`, `source:create/update/delete`
 
 **full** adds:
-`workspace:update/delete`, `audit_log:admin`, `user:admin`, `integration_log:admin`, `member:invite/remove/update_role`, `api_key:manage`
+`workspace:update/delete`, `audit_log:admin`, `user:admin`, `connection_log:admin`, `member:invite/remove/update_role`, `api_key:manage`
 
 ## Allow Destructive
 
