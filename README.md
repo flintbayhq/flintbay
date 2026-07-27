@@ -314,17 +314,60 @@ docker exec rch bash -c 'gunzip -c /var/lib/rch/backups/pg_YYYYMMDD_HHMMSS.sql.g
   /usr/lib/postgresql/17/bin/psql -h localhost -U rch -d rch'
 ```
 
+## Deployment Administration
+
+Some things belong to the deployment rather than to a workspace: the accounts that
+can sign in, the personal access tokens that reach every workspace their owner
+belongs to, and the platform's own event log. Workspace roles cannot govern them —
+an administrator of one workspace has no claim on accounts or events that concern
+the others.
+
+Name the accounts that administer the deployment:
+
+```yaml
+environment:
+  RCH_SUPERADMIN_USERNAMES: admin        # comma-separated for several: admin,ops
+```
+
+Leave it empty and nobody administers the deployment: the three surfaces below
+answer 403 to everyone. The value is matched case-insensitively against the
+username, and a name that matches no account grants nothing — the resolution is
+written to the system log on every start, so a typo is visible there rather than
+showing up later as an unexplained 403.
+
+There is deliberately no way to grant this from inside the product. Controlling
+the deployment *is* the authority, so it lives in the deployment's configuration.
+Changing it takes effect on the next request; no re-login is needed.
+
+A deployment administrator gets three extra buttons in the sidebar:
+
+| Button | What it covers |
+|--------|----------------|
+| **API Keys** | Create, rotate and revoke personal access tokens |
+| **System Log** | Platform events: rejected content-security policies, rate-limit hits, failed sign-ins, scheduler runs, lifecycle changes |
+| **Users** | Create accounts, rename, activate/deactivate, reset passwords, delete |
+
+Two changes are refused, because nothing inside the product could undo them:
+deactivating or deleting your own account, and doing either to an account named in
+`RCH_SUPERADMIN_USERNAMES`.
+
+Creating an account grants no access. A new account can sign in and will see
+nothing until a workspace administrator invites it — see
+[Workspace Sharing](docs/workspace-sharing.md).
+
+API key management requires a browser session: keys cannot manage keys, and they
+cannot reach any of these three surfaces even when their owner is named above.
+
 ## User Management (CLI)
+
+Day-to-day account management lives in the web interface, above. Three commands
+remain in the CLI for the cases where nobody can sign in to reach it:
 
 ```bash
 docker exec -w /app/api rch /opt/rch-api/bin/python -m src.cli --help              # show all commands
-docker exec -it -w /app/api rch /opt/rch-api/bin/python -m src.cli create-user     # create user (interactive)
-docker exec -it -w /app/api rch /opt/rch-api/bin/python -m src.cli reset-password  # reset password
-docker exec -it -w /app/api rch /opt/rch-api/bin/python -m src.cli delete-user     # delete user
-docker exec -it -w /app/api rch /opt/rch-api/bin/python -m src.cli update-user     # update name
-docker exec -it -w /app/api rch /opt/rch-api/bin/python -m src.cli activate-user   # re-enable account
-docker exec -it -w /app/api rch /opt/rch-api/bin/python -m src.cli deactivate-user # disable account
-docker exec -w /app/api rch /opt/rch-api/bin/python -m src.cli list-users          # list all users (non-interactive)
+docker exec -w /app/api rch /opt/rch-api/bin/python -m src.cli list-users          # find an account id (non-interactive)
+docker exec -it -w /app/api rch /opt/rch-api/bin/python -m src.cli create-user     # first account, if seeding was skipped
+docker exec -it -w /app/api rch /opt/rch-api/bin/python -m src.cli reset-password  # regain access when a password is lost
 ```
 
 > **Note:** Interactive commands require `-it` flags. `list-users` works without them.

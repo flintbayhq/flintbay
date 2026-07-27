@@ -2,6 +2,17 @@
 
 API keys (Personal Access Tokens) let you authenticate with the RCH API and MCP server without a browser session. Use them for AI integrations, scripts, and automation.
 
+## Who Can Manage Keys
+
+Key management requires a **deployment administrator** session — an account named in
+`RCH_SUPERADMIN_USERNAMES`. A key carries no workspace: it authenticates its owner
+and therefore reaches every workspace that owner belongs to, so a workspace-scoped
+permission would be a narrower gate than the thing it guards. See
+[Security](security.md#deployment-administrators).
+
+Keys also cannot manage keys: these routes require a browser session, which keeps a
+leaked key from minting more.
+
 ## Creating a Key
 
 1. Sidebar → **API Keys**

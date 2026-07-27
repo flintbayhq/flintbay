@@ -14,7 +14,9 @@ Protects against brute-force login attempts.
 
 After 5 failed login attempts, the account is locked for 15 minutes. The lockout is per-account, not per-IP.
 
-> **Tip:** If you lock yourself out, wait 15 minutes or use the CLI to reset:
+> **Tip:** If you lock yourself out, wait 15 minutes. A deployment administrator can
+> reset another account's password from **Sidebar → Users**; if nobody can sign in at
+> all, use the CLI:
 > ```bash
 > docker exec -it -w /app/api rch /opt/rch-api/bin/python -m src.cli reset-password
 > ```
@@ -113,3 +115,33 @@ X-RateLimit-Limit: 100
 X-RateLimit-Remaining: 97
 X-RateLimit-Reset: 1716660000
 ```
+
+## Deployment Administrators
+
+Workspace roles answer "what may you do in *this* workspace". A few things belong
+to no workspace: the accounts that can sign in, personal access tokens (which reach
+every workspace their owner belongs to), and the platform's own event log. Those sit
+on a second axis, named in the deployment's environment:
+
+```yaml
+environment:
+  RCH_SUPERADMIN_USERNAMES: admin        # comma-separated for several
+```
+
+| Property | Behaviour |
+|----------|-----------|
+| Default | Empty — nobody administers the deployment, and the surfaces answer 403 to everyone |
+| Matching | Case-insensitive against `user.username`; an unmatched name grants nothing |
+| Granting | Only by changing the environment. There is no route and no CLI command, so the authority cannot be escalated from inside the product |
+| Revoking | Takes effect on the next request, not when the access token expires |
+| API keys | Refused on these surfaces even when the key's owner is named |
+| Visibility | Resolution is written to the system log as a `lifecycle` entry on every start |
+
+It is not a bypass: a deployment administrator gains nothing on workspace-scoped
+routes and cannot act inside a workspace they are not a member of, so the audit
+trail keeps meaning what it says.
+
+Two account changes are refused because nothing inside the product could undo them:
+deactivating or deleting your own account, and doing either to an account named in
+`RCH_SUPERADMIN_USERNAMES` — that name lives in the environment, which the
+application cannot edit.
