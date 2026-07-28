@@ -344,8 +344,14 @@ A deployment administrator gets three extra buttons in the sidebar:
 | Button | What it covers |
 |--------|----------------|
 | **API Keys** | Create, rotate and revoke personal access tokens |
-| **System Log** | Platform events: rejected content-security policies, rate-limit hits, failed sign-ins, scheduler runs, lifecycle changes |
+| **System Log** | Platform events: rejected content-security policies, rate-limit hits, rejected API keys and expired tokens, scheduler runs, lifecycle changes |
 | **Users** | Create accounts, rename, activate/deactivate, reset passwords, delete |
+
+The audit trail is on the same footing: **Information → Activity** shows who signed
+in, who failed to, and who changed what, and the tab is absent without deployment
+authority. Failed sign-ins are recorded there rather than in the platform log,
+because an attempt claims an identity from an address — the platform log keeps the
+rejections that name nobody, such as an invalid API key.
 
 Two changes are refused, because nothing inside the product could undo them:
 deactivating or deleting your own account, and doing either to an account named in
