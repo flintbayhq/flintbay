@@ -68,8 +68,6 @@ query, or fragment.
 | `RCH_API_ENABLE_DOCS` | `false` | Enables OpenAPI/Swagger routes in production. |
 | `RCH_LOG_LEVEL` | `WARNING` | API log level. |
 | `RCH_METRICS_ENABLED` | `true` | Enables Prometheus `/metrics`. |
-| `RCH_SKIP_SEED` | false | `true` skips Getting Started seed data. |
-| `RCH_DEMO_MODE` | `false` | Blocks mutations for read-only demo instances. |
 | `RCH_MCP_ENABLE` | `true` | Enables bundled MCP; `false` saves about 43–44 MiB cgroup RAM. |
 | `RCH_MCP_PUBLIC_URL` | `${RCH_PUBLIC_URL}/mcp` | Optional public MCP resource URL override. |
 | `RCH_MCP_ISSUER_URL` | `${RCH_PUBLIC_URL}/api` | Optional MCP authorization-server/API URL override. |

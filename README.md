@@ -128,8 +128,6 @@ over resource-profile defaults.
 | `RCH_MCP_PUBLIC_URL` | `${RCH_PUBLIC_URL}/mcp` | Optional public MCP resource URL override |
 | `RCH_MCP_ISSUER_URL` | `${RCH_PUBLIC_URL}/api` | Optional MCP issuer/API metadata override |
 | `RCH_MCP_LOG_LEVEL` | `INFO` | Bundled MCP log level |
-| `RCH_SKIP_SEED` | `false` | Skip Getting Started seed data |
-| `RCH_DEMO_MODE` | `false` | Read-only mode that blocks mutations |
 
 See the complete [environment contract](docs/environment.md) for namespaces,
 precedence, edge/balanced profile values, advanced settings, and compatibility
@@ -372,7 +370,7 @@ remain in the CLI for the cases where nobody can sign in to reach it:
 ```bash
 docker exec -w /app/api rch /opt/rch-api/bin/python -m src.cli --help              # show all commands
 docker exec -w /app/api rch /opt/rch-api/bin/python -m src.cli list-users          # find an account id (non-interactive)
-docker exec -it -w /app/api rch /opt/rch-api/bin/python -m src.cli create-user     # first account, if seeding was skipped
+docker exec -it -w /app/api rch /opt/rch-api/bin/python -m src.cli create-user     # first account
 docker exec -it -w /app/api rch /opt/rch-api/bin/python -m src.cli reset-password  # regain access when a password is lost
 ```
 

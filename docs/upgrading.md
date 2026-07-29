@@ -25,7 +25,6 @@ alone does not apply new environment values.
 2. Redis starts (embedded in the container)
 3. Database migrations run automatically (Alembic)
 4. API server starts
-5. If first run and `RCH_SKIP_SEED` is not set → Getting Started demo data is created
 
 ## Data Persistence
 

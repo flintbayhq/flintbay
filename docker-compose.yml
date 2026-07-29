@@ -101,13 +101,11 @@ services:
       # RCH_METRICS_ENABLED: "true"
       # RCH_SENTRY_DSN: ""
 
-      ## ─── API, diagnostics, and demo ───────────────────────────────────
+      ## ─── API and diagnostics ──────────────────────────────────────────
       # RCH_API_ENABLE_DOCS: "true"
       # RCH_LOG_LEVEL: "WARNING"
-      # RCH_SKIP_SEED: "true"
       # RCH_MEMPROF_ENABLED: "1"
       # RCH_MEMPROF_TOKEN: "change-me"
-      # RCH_DEMO_MODE: "true"
     restart: unless-stopped
 
 volumes:
