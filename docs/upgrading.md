@@ -37,6 +37,36 @@ All data lives in the `rch_data` Docker volume:
 
 As long as you don't delete the volume, your data survives any upgrade.
 
+## Breaking Changes
+
+### `RCH_SUPERADMIN_USERNAMES` was replaced
+
+It named a comma-separated set of accounts and configured nothing else, which left
+the deployment administrator unrecoverable without a shell if its password was
+lost. It is replaced by two variables:
+
+```yaml
+environment:
+  RCH_SUPERADMIN_USERNAME: admin         # one account, not a list
+  RCH_SUPERADMIN_PASSWORD: change-me     # defaults to "admin"
+```
+
+The old name is **not** accepted as an alias, because its meaning changed. Startup
+logs a warning while it is still present in the environment, so a Compose file that
+sets it says so at boot rather than at the first unexplained 403.
+
+Upgrading is safe without editing anything: both new variables default to `admin`,
+and the first boot **adopts** an existing `admin` account without touching its
+password. If your administrator account has a different name, set
+`RCH_SUPERADMIN_USERNAME` to it before restarting — otherwise that account keeps
+working but stops being the deployment administrator, and an `admin` account is
+created alongside it.
+
+From then on the account is reconciled with the environment on every start: created
+if absent, reactivated if disabled, and its password reapplied whenever
+`RCH_SUPERADMIN_PASSWORD` changes. That last part is the recovery path — lost the
+password, change the variable and restart.
+
 ## Backup Before Upgrade
 
 ```bash

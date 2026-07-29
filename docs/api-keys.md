@@ -4,8 +4,8 @@ API keys (Personal Access Tokens) let you authenticate with the RCH API and MCP 
 
 ## Who Can Manage Keys
 
-Key management requires a **deployment administrator** session — an account named in
-`RCH_SUPERADMIN_USERNAMES`. A key carries no workspace: it authenticates its owner
+Key management requires a **deployment administrator** session — the account named in
+`RCH_SUPERADMIN_USERNAME`. A key carries no workspace: it authenticates its owner
 and therefore reaches every workspace that owner belongs to, so a workspace-scoped
 permission would be a narrower gate than the thing it guards. See
 [Security](security.md#deployment-administrators).

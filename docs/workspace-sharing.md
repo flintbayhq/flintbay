@@ -16,7 +16,11 @@ RCH supports multi-user collaboration. Invite team members to your workspace and
 - **View** — See dashboards, screens, pages, widgets, sources, logs
 - **Operate** — Interact with control widgets (press buttons, move sliders, toggle switches)
 - **Edit** — Create/modify/delete screens, pages, widgets, sources, endpoints, bindings
-- **Admin** — Manage workspace settings, invite/remove members, change roles, manage API keys
+- **Admin** — Manage workspace settings, invite/remove members, change roles
+
+None of the four covers accounts or API keys. Creating accounts, resetting
+passwords and minting personal access tokens sit on the deployment axis, not on a
+workspace role — see [Security](security.md#deployment-administrators).
 
 ## Inviting Members
 
@@ -29,6 +33,13 @@ RCH supports multi-user collaboration. Invite team members to your workspace and
 The user must already have an RCH account. They'll see the workspace in their workspace selector immediately.
 
 > **Tip:** Use the `operator` role for people who only need to press buttons and monitor — they can't accidentally break your dashboard configuration.
+
+> **The other way in:** the deployment administrator can also place an account into
+> any workspace from **Sidebar → Users → Workspace access**, without being a member
+> of that workspace first. It is the same table and the same four roles; what differs
+> is that the workspace's own admin invites *into their workspace*, while the
+> deployment administrator can do it across all of them. Both are recorded in the
+> audit trail.
 
 ## Changing Roles
 

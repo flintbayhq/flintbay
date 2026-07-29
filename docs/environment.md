@@ -55,7 +55,8 @@ query, or fragment.
 | `RCH_POSTGRES_PASSWORD` | generated | Embedded PostgreSQL password, persisted in the data volume. |
 | `RCH_REDIS_PASSWORD` | generated | Embedded Redis password, persisted in the data volume. |
 | `RCH_JWT_SECRET_KEY` | generated | Persisted JWT signing key; explicit production values must be at least 32 bytes. |
-| `RCH_SUPERADMIN_USERNAMES` | empty | Comma-separated usernames that administer the deployment: API keys, the platform event log and account management. Empty means nobody, and those surfaces answer 403 to everyone. See [Security](security.md#deployment-administrators). |
+| `RCH_SUPERADMIN_USERNAME` | `admin` | The single account that administers the deployment: API keys, the platform event log, account management and workspace access. Empty means nobody, and those surfaces answer 403 to everyone. See [Security](security.md#deployment-administrators). |
+| `RCH_SUPERADMIN_PASSWORD` | `admin` | Password for that account. Created if absent and reactivated if disabled on every start; the password itself is applied only when this value changes, so one set in the interface survives restarts. Changing it and restarting is the supported recovery path. **Change it before exposing the deployment.** |
 | `RCH_JWT_PREVIOUS_SECRET_KEY` | empty | Previous JWT key during a bounded rotation window. |
 | `RCH_DATABASE_URL` | empty | External PostgreSQL URL; disables embedded PostgreSQL. |
 | `RCH_REDIS_URL` | generated local URL | Explicit external Redis URL; disables embedded Redis. |

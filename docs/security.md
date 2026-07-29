@@ -15,11 +15,7 @@ Protects against brute-force login attempts.
 After 5 failed login attempts, the account is locked for 15 minutes. The lockout is per-account, not per-IP.
 
 > **Tip:** If you lock yourself out, wait 15 minutes. A deployment administrator can
-> reset another account's password from **Sidebar → Users**; if nobody can sign in at
-> all, use the CLI:
-> ```bash
-> docker exec -it -w /app/api rch /opt/rch-api/bin/python -m src.cli reset-password
-> ```
+> reset another account's password from **Sidebar → Users**.
 
 ## Password Policy
 
@@ -125,23 +121,33 @@ on a second axis, named in the deployment's environment:
 
 ```yaml
 environment:
-  RCH_SUPERADMIN_USERNAMES: admin        # comma-separated for several
+  RCH_SUPERADMIN_USERNAME: admin
+  RCH_SUPERADMIN_PASSWORD: change-me     # defaults to "admin" — change it
 ```
 
 | Property | Behaviour |
 |----------|-----------|
-| Default | Empty — nobody administers the deployment, and the surfaces answer 403 to everyone |
-| Matching | Case-insensitive against `user.username`; an unmatched name grants nothing |
-| Granting | Only by changing the environment. There is no route and no CLI command, so the authority cannot be escalated from inside the product |
+| Default | `admin` / `admin`, so a fresh deployment is enterable without reading a log. Change the password before exposing it beyond a trusted network |
+| Default in use | Startup logs a warning, the boot `lifecycle` entry flags it, and the Users dialog shows a banner — reported only to the administrator's own session, never to other accounts |
+| Count | One account. The authority is deployment-wide, so a second holder adds capability to nobody and one more secret to keep |
+| Matching | Case-insensitive against `user.username`; empty means nobody administers the deployment |
+| Self-healing | Created if absent and reactivated if disabled on every start, so deleting or deactivating it lasts only until the next restart |
+| Password | Applied only when the environment value changes. A password set in the interface survives restarts; an upgrade adopts an existing account without resetting it |
+| Recovery | Change `RCH_SUPERADMIN_PASSWORD` and restart. No shell access and no command-line tool are involved |
+| Granting | Only by changing the environment. There is no route, so the authority cannot be escalated from inside the product |
 | Revoking | Takes effect on the next request, not when the access token expires |
 | API keys | Refused on these surfaces even when the key's owner is named |
-| Visibility | Resolution is written to the system log as a `lifecycle` entry on every start |
+| Visibility | The boot outcome is written to the system log as a `lifecycle` entry on every start |
+| Policy | The environment password is not subject to `RCH_PASSWORD_MIN_LENGTH` — refusing to boot over it would leave no administrator to fix it with. A short value is reported, not refused |
 
 It is not a bypass: a deployment administrator gains nothing on workspace-scoped
-routes and cannot act inside a workspace they are not a member of, so the audit
-trail keeps meaning what it says.
+routes and cannot act inside a workspace they are not a member of. They can place
+*themselves* into a workspace — explicitly, from the Users dialog, and the grant is
+audited like any other. What they cannot do is read a workspace's data without a
+membership that says so, which is what keeps the audit trail meaning what it says.
 
 Two account changes are refused because nothing inside the product could undo them:
-deactivating or deleting your own account, and doing either to an account named in
-`RCH_SUPERADMIN_USERNAMES` — that name lives in the environment, which the
-application cannot edit.
+deactivating or deleting your own account, and doing either to the account named in
+`RCH_SUPERADMIN_USERNAME` — that name lives in the environment, which the
+application cannot edit. The guard is a courtesy rather than the real protection:
+the next restart recreates the account regardless.

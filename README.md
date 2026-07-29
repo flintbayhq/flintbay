@@ -320,22 +320,38 @@ belongs to, and the platform's own event log. Workspace roles cannot govern them
 an administrator of one workspace has no claim on accounts or events that concern
 the others.
 
-Name the accounts that administer the deployment:
+Name the account that administers the deployment, and give it a password:
 
 ```yaml
 environment:
-  RCH_SUPERADMIN_USERNAMES: admin        # comma-separated for several: admin,ops
+  RCH_SUPERADMIN_USERNAME: admin
+  RCH_SUPERADMIN_PASSWORD: change-me     # defaults to "admin" — change it
 ```
 
-Leave it empty and nobody administers the deployment: the three surfaces below
-answer 403 to everyone. The value is matched case-insensitively against the
-username, and a name that matches no account grants nothing — the resolution is
-written to the system log on every start, so a typo is visible there rather than
-showing up later as an unexplained 403.
+Both default, so a fresh deployment can be signed into as `admin` / `admin`
+without reading anything first. **Change the password before exposing the
+deployment beyond a trusted network**: while the default is in force, startup logs
+a warning and the Users dialog shows a banner.
+
+The account is reconciled with the environment on every start. It is created if
+absent and reactivated if disabled, so deleting or deactivating it survives no
+further than the next restart. The password is applied only when the environment
+value *changes* — an administrator who sets their own password in the interface
+keeps it across restarts, and an upgrade adopts an existing account without
+resetting its credential.
+
+That is also the recovery path. Lost the password? Change
+`RCH_SUPERADMIN_PASSWORD`, restart, sign in. No shell, and no command-line tool to
+learn.
+
+One account, not a list. Everything the authority unlocks is deployment-wide, so a
+second holder adds no capability — only a second secret to keep. Teams are served
+by the other axis, where four roles divide work per workspace.
 
 There is deliberately no way to grant this from inside the product. Controlling
 the deployment *is* the authority, so it lives in the deployment's configuration.
-Changing it takes effect on the next request; no re-login is needed.
+Leave `RCH_SUPERADMIN_USERNAME` empty and nobody administers the deployment: the
+surfaces below answer 403 to everyone.
 
 A deployment administrator gets three extra buttons in the sidebar:
 
@@ -343,7 +359,7 @@ A deployment administrator gets three extra buttons in the sidebar:
 |--------|----------------|
 | **API Keys** | Create, rotate and revoke personal access tokens |
 | **System Log** | Platform events: rejected content-security policies, rate-limit hits, rejected API keys and expired tokens, scheduler runs, lifecycle changes |
-| **Users** | Create accounts, rename, activate/deactivate, reset passwords, delete |
+| **Users** | Create accounts, rename, activate/deactivate, reset passwords, delete, and grant workspace access |
 
 The audit trail is on the same footing: **Information → Activity** shows who signed
 in, who failed to, and who changed what, and the tab is absent without deployment
@@ -352,29 +368,25 @@ because an attempt claims an identity from an address — the platform log keeps
 rejections that name nobody, such as an invalid API key.
 
 Two changes are refused, because nothing inside the product could undo them:
-deactivating or deleting your own account, and doing either to an account named in
-`RCH_SUPERADMIN_USERNAMES`.
+deactivating or deleting your own account, and doing either to the account named in
+`RCH_SUPERADMIN_USERNAME`.
 
-Creating an account grants no access. A new account can sign in and will see
-nothing until a workspace administrator invites it — see
-[Workspace Sharing](docs/workspace-sharing.md).
+Creating an account grants no access on its own. Give it a workspace from the same
+Users dialog — pick a role per workspace — or let a workspace administrator invite
+it, see [Workspace Sharing](docs/workspace-sharing.md). Either way the grant is
+explicit and recorded in the audit trail; what differs is only who may make it.
 
 API key management requires a browser session: keys cannot manage keys, and they
 cannot reach any of these three surfaces even when their owner is named above.
 
-## User Management (CLI)
+## User Management
 
-Day-to-day account management lives in the web interface, above. Three commands
-remain in the CLI for the cases where nobody can sign in to reach it:
+Accounts are managed entirely from the web interface, above — creating,
+renaming, resetting passwords, activating, deactivating, deleting, and granting
+workspace access. The Users dialog is visible only to the deployment administrator.
 
-```bash
-docker exec -w /app/api rch /opt/rch-api/bin/python -m src.cli --help              # show all commands
-docker exec -w /app/api rch /opt/rch-api/bin/python -m src.cli list-users          # find an account id (non-interactive)
-docker exec -it -w /app/api rch /opt/rch-api/bin/python -m src.cli create-user     # first account
-docker exec -it -w /app/api rch /opt/rch-api/bin/python -m src.cli reset-password  # regain access when a password is lost
-```
-
-> **Note:** Interactive commands require `-it` flags. `list-users` works without them.
+There is no command-line equivalent, by design: a second implementation of the
+same rules would be a second place for them to drift.
 
 ## Supported Languages
 
