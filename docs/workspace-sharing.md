@@ -13,10 +13,17 @@ RCH supports multi-user collaboration. Invite team members to your workspace and
 
 ### What Each Level Means
 
-- **View** — See dashboards, screens, pages, widgets, sources, logs
-- **Operate** — Interact with control widgets (press buttons, move sliders, toggle switches)
-- **Edit** — Create/modify/delete screens, pages, widgets, sources, endpoints, bindings
-- **Admin** — Manage workspace settings, invite/remove members, change roles
+- **View** — See dashboards, screens, pages, widgets
+- **Operate** — Interact with control widgets (press buttons, move sliders, toggle switches), and
+  observe the connections behind them: connection logs, source health, failures, warnings, and the
+  values an endpoint has recently delivered
+- **Edit** — Create/modify/delete screens, pages, widgets, sources, endpoints, bindings, and read
+  the workspace's audit trail: who created, changed or deleted what
+- **Admin** — Manage workspace settings, invite/remove members, change roles, clear the connection log
+
+Observing a connection and configuring it are separate: an operator can see that a source is
+down, with its latency and last error, but cannot read its configuration — which is where the
+broker credentials and authorization headers live.
 
 None of the four covers accounts or API keys. Creating accounts, resetting
 passwords and minting personal access tokens sit on the deployment axis, not on a
@@ -35,7 +42,7 @@ The user must already have an RCH account. They'll see the workspace in their wo
 > **Tip:** Use the `operator` role for people who only need to press buttons and monitor — they can't accidentally break your dashboard configuration.
 
 > **The other way in:** the deployment administrator can also place an account into
-> any workspace from **Sidebar → Users → Workspace access**, without being a member
+> any workspace from **Sidebar → Administration → Users → Workspace access**, without being a member
 > of that workspace first. It is the same table and the same four roles; what differs
 > is that the workspace's own admin invites *into their workspace*, while the
 > deployment administrator can do it across all of them. Both are recorded in the

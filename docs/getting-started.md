@@ -54,7 +54,7 @@ Open **http://localhost:19580** — done.
 | Username | `admin` |
 | Password | `admin` |
 
-⚠️ Change the password immediately after first login (sidebar → Settings → Account).
+⚠️ Change the password immediately after first login (Sidebar → **Administration** → **Users** → reset password).
 
 ## Create a Workspace
 

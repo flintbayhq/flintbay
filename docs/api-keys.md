@@ -15,7 +15,7 @@ leaked key from minting more.
 
 ## Creating a Key
 
-1. Sidebar → **API Keys**
+1. Sidebar → **Administration** → **API Keys**
 2. Click **Create Key**
 3. Choose a **name**, **scope preset**, and **expiry**
 4. Copy the key immediately — it's shown only once
@@ -33,13 +33,16 @@ The key format: `rch_pat_<random>` (prefix `rch_pat_` identifies it as an RCH to
 ### Detailed Scopes
 
 **read-only** includes:
-`screen:view`, `page:view`, `widget:view`, `binding:view`, `endpoint:view`, `source:view`, `audit_log:view`, `connection_log:view`, `member:view`
+`screen:view`, `page:view`, `widget:view`, `binding:view`, `endpoint:view`, `source:view`, `audit_log:view`, `telemetry:view`, `member:view`
 
 **dashboard** adds:
 `screen:create/update/delete`, `page:create/update/delete`, `widget:create/update/delete/interact`, `binding:create/update/delete`, `endpoint:create/update/delete`, `source:create/update/delete`
 
 **full** adds:
 `workspace:update/delete`, `audit_log:admin`, `user:admin`, `connection_log:admin`, `member:invite/remove/update_role`, `api_key:manage`
+
+> A key never exceeds its owner: a request through it must pass both the key's scopes **and** the
+> owner's role in the workspace it addresses. Scopes narrow, they do not grant.
 
 ## Allow Destructive
 
@@ -102,7 +105,7 @@ const ws = new WebSocket("ws://localhost:19580/api/ws?token=rch_pat_...");
 
 Rotate a key to get a new secret while keeping the same name and scopes:
 
-1. Sidebar → **API Keys**
+1. Sidebar → **Administration** → **API Keys**
 2. Click the rotate icon on the key
 3. The old key is immediately revoked
 4. Copy the new key

@@ -15,7 +15,7 @@ Protects against brute-force login attempts.
 After 5 failed login attempts, the account is locked for 15 minutes. The lockout is per-account, not per-IP.
 
 > **Tip:** If you lock yourself out, wait 15 minutes. A deployment administrator can
-> reset another account's password from **Sidebar → Users**.
+> reset another account's password from **Sidebar → Administration → Users**.
 
 ## Password Policy
 
@@ -86,7 +86,17 @@ All security events are logged to the audit log:
 - Rate limit hits
 - API key usage
 
-View audit logs in the sidebar → **Audit Log**, or query via API.
+There are two views of the trail, on the two authorization axes:
+
+- **Sidebar → Administration → Activity** — the complete trail, for the deployment
+  administrator. Authentication events, commands and rows whose workspace has since been
+  deleted only exist here, because none of them carries a workspace.
+- **Sidebar → Monitor → Activity** — one workspace's own history, for anyone with
+  `audit_log:view` in it (admin and editor). Scoped to that workspace and limited to what a
+  workspace owns: what was created, changed, deleted or commanded. Sign-in events are not
+  part of it.
+
+Either can also be queried via API.
 
 | Setting | Default | Description |
 |---------|---------|-------------|

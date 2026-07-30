@@ -90,7 +90,10 @@ Data is stored in the `rch_data` volume and survives container restarts and imag
 - **Widget** — UI control (button, joystick, slider, gauge, video, chart, etc.)
 - **Source** → **Endpoint** — device connection; source is the transport (REST / MQTT / ROS 2 / WebSocket), endpoints are individual channels
 - **Binding Group** → **Binding Mapping** — links widgets to endpoints for real-time data flow
-- **Roles** — `admin`, `editor`, `operator`, `viewer` — workspace-scoped permissions
+- **Roles** — `admin`, `editor`, `operator`, `viewer` — workspace-scoped permissions. Observing a
+  connection (`telemetry:view`: logs, health, failures) and configuring it (`source:view`, which
+  exposes credentials) are separate rights, which is what lets an operator diagnose without
+  reading secrets
 
 ## Default Credentials
 
@@ -240,7 +243,7 @@ RCH ships with a built-in [MCP server](https://modelcontextprotocol.io/) — no 
 
 **1. Generate an API key**
 
-Sidebar → **API Keys** → **Create Key**. Pick a scope (`Dashboard Management` is a good default) and copy the key. It's shown only once.
+Sidebar → **Administration** → **API Keys** → **Create Key**. Pick a scope (`Dashboard Management` is a good default) and copy the key. It's shown only once.
 
 **2. Paste the config**
 
@@ -392,7 +395,7 @@ same rules would be a second place for them to drift.
 
 Arabic, Chinese (Simplified), English, French, German, Hindi, Italian, Japanese, Korean, Polish, Portuguese (Brazil), Spanish, Ukrainian.
 
-Change language in the sidebar → Settings → Language.
+Change language in the sidebar → your name (bottom of the sidebar) → **User Settings**.
 
 ## Documentation
 
