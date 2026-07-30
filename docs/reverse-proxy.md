@@ -16,6 +16,31 @@ environment:
 Use `RCH_CORS_ORIGINS` or `RCH_COOKIE_SECURE` only when the proxy topology
 requires an explicit override.
 
+## Important: Live video bypasses the proxy
+
+Everything HTTP — UI, API, WebSocket, MCP, and the LL-HLS video fallback — goes
+through your proxy on `19580`. WebRTC live video does not: ICE is not HTTP and
+cannot be reverse-proxied. Publish the media port on the RCH container itself
+and open it in the firewall or security group:
+
+```yaml
+  rch:
+    image: ghcr.io/kwaadx/rch:latest
+    ports:
+      - "8189:8189/udp"   # not proxied — direct to the container
+      - "8189:8189/tcp"
+```
+
+The gateway derives its ICE host from `RCH_PUBLIC_URL`, so a proxy that
+terminates TLS for `rch.example.com` needs no media-specific configuration.
+Only when the browser reaches media through a different address — a separate
+media DNS name, or a NAT address the origin does not resolve to — set
+`RCH_MEDIA_WEBRTC_HOST` to that address.
+
+Skipping this is a supported degradation, not a failure: video falls back to
+LL-HLS through the proxy with about a second more latency. Tunnels that carry
+only HTTP, including Cloudflare Tunnel, always take that fallback path.
+
 ## Important: WebSocket Support
 
 RCH uses WebSocket for real-time data. Your proxy **must** support WebSocket upgrades on all paths. The key headers:
@@ -240,4 +265,6 @@ Expected: `101 Switching Protocols`
 | Login redirect loop | Set `RCH_PUBLIC_URL` to the exact external HTTPS origin |
 | 502 Bad Gateway | RCH container not running or wrong service name in proxy config |
 | Mixed content warnings | Ensure all traffic uses the `RCH_PUBLIC_URL` HTTPS origin |
+| Camera video plays but lags about a second | WebRTC could not connect and LL-HLS took over; publish `8189/udp` and `8189/tcp` and open them upstream |
+| Camera video never starts | Check the Source in Connection Studio; the media port only affects which transport is used, not authorization |
 | CSRF token mismatch | Verify `RCH_PUBLIC_URL`; override cookie domain/SameSite only when required |

@@ -21,7 +21,9 @@ services:
   rch:
     image: ghcr.io/kwaadx/rch:latest
     ports:
-      - "19580:19580"
+      - "19580:19580"        # web UI, API, MCP
+      - "8189:8189/udp"      # live video (WebRTC)
+      - "8189:8189/tcp"      # live video on UDP-blocked networks
     volumes:
       - rch_data:/var/lib/rch
     environment:
@@ -36,6 +38,11 @@ For remote HTTPS access, replace `RCH_PUBLIC_URL` with the exact external
 origin. ARM64 users can select `ghcr.io/kwaadx/rch:latest-arm64`, but should
 verify that the independently published architecture tag matches the intended
 release before upgrading.
+
+Port `8189` carries live camera video over WebRTC, which cannot share the HTTP
+port. Remote deployments must open it in the firewall or cloud security group
+too; if it stays closed, video still plays over `19580` as LL-HLS with about a
+second more latency. See [Live video](environment.md#live-video).
 
 Start it:
 

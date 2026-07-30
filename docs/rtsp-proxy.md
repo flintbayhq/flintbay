@@ -2,6 +2,15 @@
 
 RCH includes a built-in RTSP-to-browser proxy. View IP camera feeds directly in your dashboard without exposing RTSP ports to the browser or installing plugins.
 
+> **Prefer a media Source for new cameras.** This page describes the original
+> path: an RTSP URL typed straight into a widget, transcoded by one ffmpeg
+> process per stream. Registering the camera as a media Source instead routes it
+> through the built-in media gateway, which pulls the camera once for all
+> viewers and delivers WebRTC with LL-HLS fallback — sub-second instead of
+> several seconds, and no per-viewer ffmpeg. See
+> [Live video](environment.md#live-video). The path below stays supported for
+> existing widgets and is not going away without an announced migration.
+
 ## How It Works
 
 ```

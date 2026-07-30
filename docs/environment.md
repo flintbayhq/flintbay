@@ -10,6 +10,9 @@ PostgreSQL and Redis are embedded by default and can be replaced independently.
   `environment:`, `docker run -e`, or an orchestrator secret.
 - `WEB_PORT` in this repository's Compose file is only a host-side Compose
   input. It is not passed into the container.
+- `MEDIA_PORT` is a Compose input too, but unlike `WEB_PORT` it is also passed
+  in as `RCH_MEDIA_WEBRTC_PORT`, because the container advertises its own media
+  port number in ICE candidates and the two must agree.
 - Generic `POSTGRES_*` and `MCP_*` names are internal child-process adapters,
   not supported all-in-one overrides.
 - Explicit container values override resource-profile defaults, which override
@@ -28,12 +31,15 @@ services:
     image: ghcr.io/kwaadx/rch:latest
     ports:
       - "${WEB_PORT:-19580}:19580"
+      - "${MEDIA_PORT:-8189}:${MEDIA_PORT:-8189}/udp"
+      - "${MEDIA_PORT:-8189}:${MEDIA_PORT:-8189}/tcp"
     volumes:
       - rch_data:/var/lib/rch
     environment:
       RCH_PUBLIC_URL: "https://rch.example.com"
       RCH_RESOURCE_PROFILE: "edge"
       RCH_API_WORKERS: "1"
+      RCH_MEDIA_WEBRTC_PORT: "${MEDIA_PORT:-8189}"
     restart: unless-stopped
 
 volumes:
@@ -73,6 +79,38 @@ query, or fragment.
 | `RCH_MCP_PUBLIC_URL` | `${RCH_PUBLIC_URL}/mcp` | Optional public MCP resource URL override. |
 | `RCH_MCP_ISSUER_URL` | `${RCH_PUBLIC_URL}/api` | Optional MCP authorization-server/API URL override. |
 | `RCH_MCP_LOG_LEVEL` | `INFO` | Bundled MCP log level. |
+
+## Live video
+
+Camera and stream Sources that speak `rtsp://`, `rtmp://` or `srt://` are pulled
+once by the image's media gateway and delivered to every viewer as WebRTC, with
+automatic LL-HLS fallback. This is enabled by default and needs no
+configuration.
+
+WebRTC media is not HTTP and cannot be multiplexed over `19580`, so it uses one
+additional published port. Publish it with equal host and container numbers —
+the container advertises its own number in ICE candidates — and open it in the
+host firewall or cloud security group for remote access. A closed media port is
+not an outage: playback falls back to LL-HLS over `19580`, roughly a second
+slower.
+
+| Variable | Default | Purpose |
+|---|---|---|
+| `RCH_MEDIA_WEBRTC_PORT` | `8189` | WebRTC transport port, served as UDP and as ICE-TCP on the same number for networks that block UDP. |
+| `RCH_MEDIA_WEBRTC_HOST` | derived from `RCH_PUBLIC_URL` | Host advertised in ICE candidates; set it only when the browser reaches media through a different address than the public origin. |
+| `RCH_MEDIA_GATEWAY_ENABLED` | `true` | Set `false` to drop the gateway process; `rtsp://`, `rtmp://` and `srt://` Sources then stop playing. |
+| `RCH_MEDIA_GATEWAY_MAX_READERS` | `8` on `edge`, `32` on `balanced` | Concurrent viewers sharing one upstream pull, per stream. |
+| `RCH_MEDIA_GATEWAY_SOURCE_CLOSE_AFTER` | `10s` | Idle delay before the shared upstream pull is closed. |
+
+Gateway credentials are generated on first boot and persisted in the data
+volume; they are not operator inputs. Media routes are authorized per workspace
+on every request, and the gateway accepts no publishers. To rotate the
+credentials, delete `.mediamtx_control_password` and `.mediamtx_read_password`
+from the volume and restart.
+
+Direct browser-playable URLs (HLS, DASH, WHEP, MJPEG) are unaffected and never
+pass through the gateway. Legacy `rtsp://` URLs typed straight into a widget
+still use the older ffmpeg proxy described in [RTSP proxy](rtsp-proxy.md).
 
 ## Resource profiles
 

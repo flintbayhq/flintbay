@@ -8,6 +8,14 @@ services:
     ports:
       # WEB_PORT is a host-side Compose input, not an image runtime variable.
       - "${WEB_PORT:-19580}:19580"
+      ## Live-video transport for camera/stream Sources. WebRTC carries media
+      ## over its own port because ICE is not HTTP and cannot share 19580.
+      ## Keep the host and container numbers equal: the container advertises
+      ## its own port number in ICE candidates. Remote deployments must also
+      ## open it in the firewall or cloud security group; without it playback
+      ## silently falls back to higher-latency LL-HLS over 19580.
+      - "${MEDIA_PORT:-8189}:${MEDIA_PORT:-8189}/udp"
+      - "${MEDIA_PORT:-8189}:${MEDIA_PORT:-8189}/tcp"
     volumes:
       - rch_data:/var/lib/rch
     environment:
@@ -16,6 +24,20 @@ services:
       ## secure cookies; CORS and MCP metadata derive from the same value.
       RCH_PUBLIC_URL: "${RCH_PUBLIC_URL:-http://localhost:19580}"
       RCH_RESOURCE_PROFILE: "${RCH_RESOURCE_PROFILE:-edge}"
+
+      ## ─── Live video ───────────────────────────────────────────────────
+      ## The media gateway is on by default; RTSP/RTMP/SRT camera Sources
+      ## play as low-latency WebRTC with automatic LL-HLS fallback. The
+      ## advertised media port must match the published one above.
+      RCH_MEDIA_WEBRTC_PORT: "${MEDIA_PORT:-8189}"
+
+      ## The ICE host is derived from RCH_PUBLIC_URL. Set it only when the
+      ## browser reaches media through a different address than the origin.
+      # RCH_MEDIA_WEBRTC_HOST: "media.example.com"
+      ## Turn live video off entirely; camera Sources then stop playing.
+      # RCH_MEDIA_GATEWAY_ENABLED: "false"
+      ## Concurrent viewers sharing one upstream pull (edge default 8).
+      # RCH_MEDIA_GATEWAY_MAX_READERS: "32"
 
       ## Keep one worker: connector/cache/runtime reload state is process-local.
       RCH_API_WORKERS: "1"

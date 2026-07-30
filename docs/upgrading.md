@@ -39,6 +39,24 @@ As long as you don't delete the volume, your data survives any upgrade.
 
 ## Breaking Changes
 
+### The image now publishes a live-video port
+
+Camera Sources are delivered as WebRTC, which cannot share the HTTP port, so the
+image exposes `8189` (UDP and TCP) in addition to `19580`. Nothing breaks if you
+upgrade without changing your Compose file — the port simply is not published,
+and camera playback uses the LL-HLS fallback over `19580` with about a second
+more latency. To get the low-latency path, add:
+
+```yaml
+    ports:
+      - "19580:19580"
+      - "8189:8189/udp"
+      - "8189:8189/tcp"
+```
+
+and open the port in the host firewall or cloud security group. See
+[Live video](environment.md#live-video).
+
 ### `RCH_SUPERADMIN_USERNAMES` was replaced
 
 It named a comma-separated set of accounts and configured nothing else, which left

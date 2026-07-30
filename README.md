@@ -45,7 +45,9 @@ services:
   rch:
     image: ghcr.io/kwaadx/rch:latest        # amd64 (Intel/AMD)
     ports:
-      - "19580:19580"
+      - "19580:19580"                       # web UI, API, MCP
+      - "8189:8189/udp"                     # live video (WebRTC)
+      - "8189:8189/tcp"                     # live video on UDP-blocked networks
     volumes:
       - rch_data:/var/lib/rch
     environment:
@@ -76,6 +78,13 @@ docker compose up -d
 Open **http://localhost:19580** — done.
 
 Data is stored in the `rch_data` volume and survives container restarts and image updates.
+
+> **Two ports, one of them optional.** Everything — UI, API, MCP — is served
+> over `19580`. Live camera video uses WebRTC, and WebRTC media cannot travel
+> over HTTP, so it gets its own port `8189` (UDP, plus TCP for networks that
+> block UDP). Remote deployments must open it in the firewall or cloud security
+> group as well; if it stays closed, video still plays through `19580` as
+> LL-HLS, only with about a second more latency.
 
 > Or clone this repo for a ready-made setup:
 > ```bash
@@ -124,6 +133,9 @@ over resource-profile defaults.
 | `RCH_COOKIE_SECURE` | *(derived)* | `true` for HTTPS `RCH_PUBLIC_URL`, otherwise `false` |
 | `RCH_TRUSTED_PROXIES` | *(empty)* | Trusted reverse-proxy IPs/CIDRs |
 | `RCH_ALLOW_PRIVATE_HOSTS` | `true` | Allow private-network robot/IoT source URLs |
+| `RCH_MEDIA_WEBRTC_PORT` | `8189` | Live-video transport port; publish it with equal host and container numbers |
+| `RCH_MEDIA_WEBRTC_HOST` | *(derived)* | ICE candidate host; set only when media is reached through another address than `RCH_PUBLIC_URL` |
+| `RCH_MEDIA_GATEWAY_ENABLED` | `true` | Live video for `rtsp://` / `rtmp://` / `srt://` Sources |
 | `RCH_API_ENABLE_DOCS` | `false` | Enable Swagger UI at `/api/docs` |
 | `RCH_LOG_LEVEL` | `WARNING` | API log level |
 | `RCH_METRICS_ENABLED` | `true` | Enable Prometheus `/metrics` |
