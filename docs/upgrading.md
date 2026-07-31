@@ -35,9 +35,40 @@ All data lives in the `rch_data` Docker volume:
 - PostgreSQL password
 - Backup files
 
-As long as you don't delete the volume, your data survives any upgrade.
+As long as you don't delete the volume, your data survives any upgrade — with one
+exception, for volumes first created before 2026-07-25. See
+[Volumes created before 2026-07-25](#volumes-created-before-2026-07-25).
 
 ## Breaking Changes
+
+### Volumes created before 2026-07-25
+
+During alpha, the migration history was squashed into a single baseline and
+numbering restarted. Revision numbers before and after that change therefore mean
+different migrations, and the database records only the number. A volume first
+created before 2026-07-25 cannot be upgraded: continuing would either fail part-way
+or, worse, skip migrations silently and leave the schema incomplete.
+
+Startup now detects this and stops before changing anything, with a message naming
+the recorded version. If you see it, nothing has been damaged — the old container
+image still runs against that volume.
+
+To keep your data, export what you need through the API while running the old
+image, then start a current release on a fresh volume and re-import. To discard it,
+remove the volume and start clean:
+
+```bash
+docker compose down
+docker volume rm rch_data
+docker compose up -d
+```
+
+A PostgreSQL dump taken from the old volume is **not** a shortcut here: it restores
+the old schema, which is what the guard refuses. The export has to go through the
+API.
+
+Volumes created on or after 2026-07-25 upgrade normally, and this will not apply to
+any future release — numbering is stable now.
 
 ### The image now publishes a live-video port
 
@@ -141,6 +172,7 @@ docker compose up -d
 | Problem | Fix |
 |---------|-----|
 | Container won't start after upgrade | Check logs: `docker logs rch` — usually a migration issue |
-| "relation does not exist" | Migration didn't run — restart the container |
+| "cannot be upgraded by this version" | The volume predates 2026-07-25. See [Volumes created before 2026-07-25](#volumes-created-before-2026-07-25) — do not restart, it will not help |
+| "relation does not exist" during migration | Restarting repeats the same failure. Check `docker logs rch` for the recorded schema version and compare against the section above |
 | Lost data after upgrade | You deleted the volume. Restore from backup if available |
 | Want to rollback | Stop container, change image tag to previous version, start |
