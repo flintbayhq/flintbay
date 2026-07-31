@@ -39,7 +39,10 @@ media DNS name, or a NAT address the origin does not resolve to — set
 
 Skipping this is a supported degradation, not a failure: video falls back to
 LL-HLS through the proxy with about a second more latency. Tunnels that carry
-only HTTP, including Cloudflare Tunnel, always take that fallback path.
+only HTTP, including Cloudflare Tunnel, always take that fallback path. The
+widget shows the active protocol on the video when it is not the preferred one,
+so a permanent `HLS` badge is the expected sight on such a deployment rather
+than a sign something is broken.
 
 ## Important: WebSocket Support
 

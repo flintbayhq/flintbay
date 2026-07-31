@@ -94,6 +94,13 @@ host firewall or cloud security group for remote access. A closed media port is
 not an outage: playback falls back to LL-HLS over `19580`, roughly a second
 slower.
 
+You can tell which path a stream took by looking at it: when playback is not on
+the preferred low-latency transport, the widget shows the active protocol in the
+corner of the video. An `HLS` badge on a camera you expected to be live-fast
+means the media port is not reachable from that client. The fallback also moves
+work onto the API, which authorizes every media segment, so a deployment serving
+many viewers over LL-HLS costs noticeably more than the same viewers over WebRTC.
+
 | Variable | Default | Purpose |
 |---|---|---|
 | `RCH_MEDIA_WEBRTC_PORT` | `8189` | WebRTC transport port, served as UDP and as ICE-TCP on the same number for networks that block UDP. |
