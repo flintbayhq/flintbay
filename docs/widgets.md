@@ -119,6 +119,21 @@ Control widgets support acknowledgment modes for reliable command delivery:
 
 Configure ACK mode in widget parameters under the `submit_mode` group.
 
+## Example Data
+
+A widget you just dropped on a page has nothing bound yet, so instead of an empty `--` most display,
+chart and data widgets render **example data** — a plausible reading, a curve, a few table rows — with
+a small diagonal `example` ribbon in the corner.
+
+- It only appears in **edit mode**. In operation mode an unbound widget shows its normal empty state,
+  so a number on a live dashboard is always a real number.
+- It disappears as soon as you bind **any** port of that widget.
+- It is generated in the browser. Nothing is stored, nothing is sent to a device, and no endpoint is
+  created for it.
+
+Media widgets (WStream, WVideo, WAudioPlayer, WAudioCapture, WIframe, WImage) never get example
+content — a fake source would mean real network requests.
+
 ## Widget Sizing
 
 - All positions and sizes snap to a 10px grid
