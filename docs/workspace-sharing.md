@@ -1,6 +1,6 @@
 # Workspace Sharing
 
-RCH supports multi-user collaboration. Invite team members to your workspace and assign roles that control what they can do.
+Flintbay supports multi-user collaboration. Invite team members to your workspace and assign roles that control what they can do.
 
 ## Roles
 
@@ -37,7 +37,7 @@ workspace role — see [Security](security.md#deployment-administrators).
 4. Select a role
 5. Click **Add**
 
-The user must already have an RCH account. They'll see the workspace in their workspace selector immediately.
+The user must already have a Flintbay account. They'll see the workspace in their workspace selector immediately.
 
 > **Tip:** Use the `operator` role for people who only need to press buttons and monitor — they can't accidentally break your dashboard configuration.
 

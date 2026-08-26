@@ -5,14 +5,14 @@ Poll a REST API at regular intervals and display the data on a real-time chart. 
 ## Architecture
 
 ```
-REST API (JSON) ← RCH polls every N seconds → Chart + Value Display
+REST API (JSON) ← Flintbay polls every N seconds → Chart + Value Display
 ```
 
 ## Use Case
 
 We'll poll a weather API and display temperature history on a chart with current value on a gauge.
 
-## 1. RCH Source Configuration
+## 1. Flintbay Source Configuration
 
 1. **Sources** → **+ Add Source**
 2. Configure:
@@ -160,7 +160,7 @@ Chain multiple transforms:
 | Database dashboard | 5000–10000ms | Reduce DB load |
 | Health check | 10000–30000ms | Just need up/down |
 
-> **Tip:** When no browser tab is viewing the page, RCH automatically throttles REST polling to save resources (demand-aware lifecycle). The cached value is replayed instantly when you return.
+> **Tip:** When no browser tab is viewing the page, Flintbay automatically throttles REST polling to save resources (demand-aware lifecycle). The cached value is replayed instantly when you return.
 
 ## Troubleshooting
 
@@ -168,7 +168,7 @@ Chain multiple transforms:
 |---------|-----|
 | Chart shows nothing | Verify `history_size > 0` in endpoint config |
 | Wrong value displayed | Use `test_fetch_endpoint` (MCP) or check payload_path |
-| CORS errors in logs | RCH backend makes the request, not the browser — CORS doesn't apply |
+| CORS errors in logs | Flintbay backend makes the request, not the browser — CORS doesn't apply |
 | API returns HTML | Check the endpoint address — likely a 404 redirect |
 
 ## Next Steps

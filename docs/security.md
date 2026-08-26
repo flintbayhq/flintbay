@@ -1,6 +1,6 @@
 # Security Configuration
 
-RCH includes several security features that are enabled by default. This page covers account lockout, password policy, JWT key rotation, and session management.
+Flintbay includes several security features that are enabled by default. This page covers account lockout, password policy, JWT key rotation, and session management.
 
 ## Account Lockout
 
@@ -8,9 +8,9 @@ Protects against brute-force login attempts.
 
 | Setting | Default | Description |
 |---------|---------|-------------|
-| `RCH_LOCKOUT_ENABLED` | `true` | Enable/disable lockout |
-| `RCH_LOCKOUT_MAX_ATTEMPTS` | `5` | Failed attempts before lockout |
-| `RCH_LOCKOUT_DURATION_MINUTES` | `15` | How long the account is locked |
+| `FLINTBAY_LOCKOUT_ENABLED` | `true` | Enable/disable lockout |
+| `FLINTBAY_LOCKOUT_MAX_ATTEMPTS` | `5` | Failed attempts before lockout |
+| `FLINTBAY_LOCKOUT_DURATION_MINUTES` | `15` | How long the account is locked |
 
 After 5 failed login attempts, the account is locked for 15 minutes. The lockout is per-account, not per-IP.
 
@@ -21,8 +21,8 @@ After 5 failed login attempts, the account is locked for 15 minutes. The lockout
 
 | Setting | Default | Description |
 |---------|---------|-------------|
-| `RCH_PASSWORD_MIN_LENGTH` | `8` | Minimum password length |
-| `RCH_PASSWORD_MAX_LENGTH` | `72` | Maximum length (bcrypt limit) |
+| `FLINTBAY_PASSWORD_MIN_LENGTH` | `8` | Minimum password length |
+| `FLINTBAY_PASSWORD_MAX_LENGTH` | `72` | Maximum length (bcrypt limit) |
 
 Passwords are hashed with bcrypt. The 72-character limit is a bcrypt constraint — characters beyond 72 are silently ignored by the algorithm.
 
@@ -30,33 +30,33 @@ Passwords are hashed with bcrypt. The 72-character limit is a bcrypt constraint 
 
 | Setting | Default | Description |
 |---------|---------|-------------|
-| `RCH_JWT_SECRET_KEY` | *(auto-generated)* | Signing key for access tokens |
-| `RCH_JWT_TOKEN_EXPIRE_MINUTES` | `30` | Access token lifetime |
-| `RCH_JWT_ALGORITHM` | `HS256` | Signing algorithm |
+| `FLINTBAY_JWT_SECRET_KEY` | *(auto-generated)* | Signing key for access tokens |
+| `FLINTBAY_JWT_TOKEN_EXPIRE_MINUTES` | `30` | Access token lifetime |
+| `FLINTBAY_JWT_ALGORITHM` | `HS256` | Signing algorithm |
 
 ### Auto-Generated Secret
 
-On first run, RCH generates a random JWT secret and persists it in the data volume at `/var/lib/rch/.jwt_secret`. This survives container restarts and image updates.
+On first run, Flintbay generates a random JWT secret and persists it in the data volume at `/var/lib/flintbay/.jwt_secret`. This survives container restarts and image updates.
 
 ### Key Rotation
 
 To rotate the JWT signing key without invalidating all active sessions:
 
-1. Set `RCH_JWT_PREVIOUS_SECRET_KEY` to the current key
-2. Set `RCH_JWT_SECRET_KEY` to the new key
+1. Set `FLINTBAY_JWT_PREVIOUS_SECRET_KEY` to the current key
+2. Set `FLINTBAY_JWT_SECRET_KEY` to the new key
 3. Restart the container
 4. Wait for `token_expire_minutes` (30 min by default) — old tokens expire naturally
-5. Remove `RCH_JWT_PREVIOUS_SECRET_KEY`
+5. Remove `FLINTBAY_JWT_PREVIOUS_SECRET_KEY`
 
-During the transition window, RCH accepts tokens signed with either key.
+During the transition window, Flintbay accepts tokens signed with either key.
 
 ## Session Management
 
 | Setting | Default | Description |
 |---------|---------|-------------|
-| `RCH_SESSION_MAX_CONCURRENT` | `5` | Max active sessions per user |
-| `RCH_SESSION_REFRESH_TOKEN_EXPIRE_DAYS` | `30` | Refresh token lifetime |
-| `RCH_SESSION_REVOKE_OLD_ON_MAX` | `true` | Auto-revoke oldest session when limit reached |
+| `FLINTBAY_SESSION_MAX_CONCURRENT` | `5` | Max active sessions per user |
+| `FLINTBAY_SESSION_REFRESH_TOKEN_EXPIRE_DAYS` | `30` | Refresh token lifetime |
+| `FLINTBAY_SESSION_REVOKE_OLD_ON_MAX` | `true` | Auto-revoke oldest session when limit reached |
 
 ### How Sessions Work
 
@@ -69,12 +69,12 @@ During the transition window, RCH accepts tokens signed with either key.
 
 | Setting | Default | Description |
 |---------|---------|-------------|
-| `RCH_PUBLIC_URL` | `http://localhost:19580` | External origin; HTTPS derives secure cookies |
-| `RCH_COOKIE_SECURE` | derived | `true` for HTTPS `RCH_PUBLIC_URL`, otherwise `false` |
-| `RCH_COOKIE_SAMESITE` | `strict` | SameSite attribute |
-| `RCH_COOKIE_DOMAIN` | *(auto)* | Cookie domain |
+| `FLINTBAY_PUBLIC_URL` | `http://localhost:19580` | External origin; HTTPS derives secure cookies |
+| `FLINTBAY_COOKIE_SECURE` | derived | `true` for HTTPS `FLINTBAY_PUBLIC_URL`, otherwise `false` |
+| `FLINTBAY_COOKIE_SAMESITE` | `strict` | SameSite attribute |
+| `FLINTBAY_COOKIE_DOMAIN` | *(auto)* | Cookie domain |
 
-> Set `RCH_PUBLIC_URL` to the real HTTPS origin in production. Override the
+> Set `FLINTBAY_PUBLIC_URL` to the real HTTPS origin in production. Override the
 > individual cookie variables only for an exceptional proxy topology.
 
 ## Audit Logging
@@ -100,8 +100,8 @@ Either can also be queried via API.
 
 | Setting | Default | Description |
 |---------|---------|-------------|
-| `RCH_AUDIT_RETENTION_DAYS` | `90` | Days to keep audit entries |
-| `RCH_AUDIT_LOG_SECURITY_EVENTS` | `true` | Log security events |
+| `FLINTBAY_AUDIT_RETENTION_DAYS` | `90` | Days to keep audit entries |
+| `FLINTBAY_AUDIT_LOG_SECURITY_EVENTS` | `true` | Log security events |
 
 ## Rate Limiting
 
@@ -131,8 +131,8 @@ on a second axis, named in the deployment's environment:
 
 ```yaml
 environment:
-  RCH_SUPERADMIN_USERNAME: admin
-  RCH_SUPERADMIN_PASSWORD: change-me     # defaults to "admin" — change it
+  FLINTBAY_SUPERADMIN_USERNAME: admin
+  FLINTBAY_SUPERADMIN_PASSWORD: change-me     # defaults to "admin" — change it
 ```
 
 | Property | Behaviour |
@@ -143,12 +143,12 @@ environment:
 | Matching | Case-insensitive against `user.username`; empty means nobody administers the deployment |
 | Self-healing | Created if absent and reactivated if disabled on every start, so deleting or deactivating it lasts only until the next restart |
 | Password | Applied only when the environment value changes. A password set in the interface survives restarts; an upgrade adopts an existing account without resetting it |
-| Recovery | Change `RCH_SUPERADMIN_PASSWORD` and restart. No shell access and no command-line tool are involved |
+| Recovery | Change `FLINTBAY_SUPERADMIN_PASSWORD` and restart. No shell access and no command-line tool are involved |
 | Granting | Only by changing the environment. There is no route, so the authority cannot be escalated from inside the product |
 | Revoking | Takes effect on the next request, not when the access token expires |
 | API keys | Refused on these surfaces even when the key's owner is named |
 | Visibility | The boot outcome is written to the system log as a `lifecycle` entry on every start |
-| Policy | The environment password is not subject to `RCH_PASSWORD_MIN_LENGTH` — refusing to boot over it would leave no administrator to fix it with. A short value is reported, not refused |
+| Policy | The environment password is not subject to `FLINTBAY_PASSWORD_MIN_LENGTH` — refusing to boot over it would leave no administrator to fix it with. A short value is reported, not refused |
 
 It is not a bypass: a deployment administrator gains nothing on workspace-scoped
 routes and cannot act inside a workspace they are not a member of. They can place
@@ -158,6 +158,6 @@ membership that says so, which is what keeps the audit trail meaning what it say
 
 Two account changes are refused because nothing inside the product could undo them:
 deactivating or deleting your own account, and doing either to the account named in
-`RCH_SUPERADMIN_USERNAME` — that name lives in the environment, which the
+`FLINTBAY_SUPERADMIN_USERNAME` — that name lives in the environment, which the
 application cannot edit. The guard is a courtesy rather than the real protection:
 the next restart recreates the account regardless.

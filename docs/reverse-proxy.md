@@ -1,41 +1,41 @@
 # Reverse Proxy Setup (HTTPS)
 
-Run RCH behind a reverse proxy with TLS termination. Covers Caddy, Nginx, and Traefik.
+Run Flintbay behind a reverse proxy with TLS termination. Covers Caddy, Nginx, and Traefik.
 
-## RCH Environment Variables
+## Flintbay Environment Variables
 
-Set the externally reachable origin. RCH derives credentialed CORS, secure
+Set the externally reachable origin. Flintbay derives credentialed CORS, secure
 cookies, and MCP metadata from this single value:
 
 ```yaml
 environment:
-  RCH_PUBLIC_URL: "https://rch.example.com"
-  RCH_TRUSTED_PROXIES: "172.16.0.0/12"  # Docker network CIDR
+  FLINTBAY_PUBLIC_URL: "https://flintbay.example.com"
+  FLINTBAY_TRUSTED_PROXIES: "172.16.0.0/12"  # Docker network CIDR
 ```
 
-Use `RCH_CORS_ORIGINS` or `RCH_COOKIE_SECURE` only when the proxy topology
+Use `FLINTBAY_CORS_ORIGINS` or `FLINTBAY_COOKIE_SECURE` only when the proxy topology
 requires an explicit override.
 
 ## Important: Live video bypasses the proxy
 
 Everything HTTP — UI, API, WebSocket, MCP, and the LL-HLS video fallback — goes
 through your proxy on `19580`. WebRTC live video does not: ICE is not HTTP and
-cannot be reverse-proxied. Publish the media port on the RCH container itself
+cannot be reverse-proxied. Publish the media port on the Flintbay container itself
 and open it in the firewall or security group:
 
 ```yaml
-  rch:
-    image: ghcr.io/kwaadx/rch:latest
+  flintbay:
+    image: ghcr.io/flintbayhq/server:latest
     ports:
       - "8189:8189/udp"   # not proxied — direct to the container
       - "8189:8189/tcp"
 ```
 
-The gateway derives its ICE host from `RCH_PUBLIC_URL`, so a proxy that
-terminates TLS for `rch.example.com` needs no media-specific configuration.
+The gateway derives its ICE host from `FLINTBAY_PUBLIC_URL`, so a proxy that
+terminates TLS for `flintbay.example.com` needs no media-specific configuration.
 Only when the browser reaches media through a different address — a separate
 media DNS name, or a NAT address the origin does not resolve to — set
-`RCH_MEDIA_WEBRTC_HOST` to that address.
+`FLINTBAY_MEDIA_WEBRTC_HOST` to that address.
 
 Skipping this is a supported degradation, not a failure: video falls back to
 LL-HLS through the proxy with about a second more latency. Tunnels that carry
@@ -46,7 +46,7 @@ than a sign something is broken.
 
 ## Important: WebSocket Support
 
-RCH uses WebSocket for real-time data. Your proxy **must** support WebSocket upgrades on all paths. The key headers:
+Flintbay uses WebSocket for real-time data. Your proxy **must** support WebSocket upgrades on all paths. The key headers:
 
 ```
 Upgrade: websocket
@@ -73,25 +73,25 @@ services:
       - caddy_data:/data
     restart: unless-stopped
 
-  rch:
-    image: ghcr.io/kwaadx/rch:latest
+  flintbay:
+    image: ghcr.io/flintbayhq/server:latest
     environment:
-      RCH_PUBLIC_URL: "https://rch.example.com"
-      RCH_TRUSTED_PROXIES: "172.16.0.0/12"
+      FLINTBAY_PUBLIC_URL: "https://flintbay.example.com"
+      FLINTBAY_TRUSTED_PROXIES: "172.16.0.0/12"
     volumes:
-      - rch_data:/var/lib/rch
+      - flintbay_data:/var/lib/flintbay
     restart: unless-stopped
 
 volumes:
-  rch_data:
+  flintbay_data:
   caddy_data:
 ```
 
 ### Caddyfile
 
 ```
-rch.example.com {
-    reverse_proxy rch:19580
+flintbay.example.com {
+    reverse_proxy flintbay:19580
 }
 ```
 
@@ -111,46 +111,46 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./nginx.conf:/etc/nginx/conf.d/rch.conf
+      - ./nginx.conf:/etc/nginx/conf.d/flintbay.conf
       - /etc/letsencrypt:/etc/letsencrypt:ro
     restart: unless-stopped
 
-  rch:
-    image: ghcr.io/kwaadx/rch:latest
+  flintbay:
+    image: ghcr.io/flintbayhq/server:latest
     environment:
-      RCH_PUBLIC_URL: "https://rch.example.com"
-      RCH_TRUSTED_PROXIES: "172.16.0.0/12"
+      FLINTBAY_PUBLIC_URL: "https://flintbay.example.com"
+      FLINTBAY_TRUSTED_PROXIES: "172.16.0.0/12"
     volumes:
-      - rch_data:/var/lib/rch
+      - flintbay_data:/var/lib/flintbay
     restart: unless-stopped
 
 volumes:
-  rch_data:
+  flintbay_data:
 ```
 
 ### nginx.conf
 
 ```nginx
-upstream rch_backend {
-    server rch:19580;
+upstream flintbay_backend {
+    server flintbay:19580;
 }
 
 server {
     listen 80;
-    server_name rch.example.com;
+    server_name flintbay.example.com;
     return 301 https://$host$request_uri;
 }
 
 server {
     listen 443 ssl;
-    server_name rch.example.com;
+    server_name flintbay.example.com;
 
-    ssl_certificate     /etc/letsencrypt/live/rch.example.com/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/rch.example.com/privkey.pem;
+    ssl_certificate     /etc/letsencrypt/live/flintbay.example.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/flintbay.example.com/privkey.pem;
 
     # WebSocket support
     location / {
-        proxy_pass http://rch_backend;
+        proxy_pass http://flintbay_backend;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
@@ -169,7 +169,7 @@ server {
 ### Get certificates with certbot:
 
 ```bash
-certbot certonly --standalone -d rch.example.com
+certbot certonly --standalone -d flintbay.example.com
 ```
 
 ---
@@ -198,22 +198,22 @@ services:
       - traefik_certs:/letsencrypt
     restart: unless-stopped
 
-  rch:
-    image: ghcr.io/kwaadx/rch:latest
+  flintbay:
+    image: ghcr.io/flintbayhq/server:latest
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.rch.rule=Host(`rch.example.com`)"
-      - "traefik.http.routers.rch.tls.certresolver=letsencrypt"
-      - "traefik.http.services.rch.loadbalancer.server.port=19580"
+      - "traefik.http.routers.flintbay.rule=Host(`flintbay.example.com`)"
+      - "traefik.http.routers.flintbay.tls.certresolver=letsencrypt"
+      - "traefik.http.services.flintbay.loadbalancer.server.port=19580"
     environment:
-      RCH_PUBLIC_URL: "https://rch.example.com"
-      RCH_TRUSTED_PROXIES: "172.16.0.0/12"
+      FLINTBAY_PUBLIC_URL: "https://flintbay.example.com"
+      FLINTBAY_TRUSTED_PROXIES: "172.16.0.0/12"
     volumes:
-      - rch_data:/var/lib/rch
+      - flintbay_data:/var/lib/flintbay
     restart: unless-stopped
 
 volumes:
-  rch_data:
+  flintbay_data:
   traefik_certs:
 ```
 
@@ -227,17 +227,17 @@ If you can't open ports (NAT, ISP restrictions):
 
 ```bash
 # Install cloudflared
-cloudflared tunnel create rch
-cloudflared tunnel route dns rch rch.example.com
-cloudflared tunnel run --url http://localhost:19580 rch
+cloudflared tunnel create flintbay
+cloudflared tunnel route dns flintbay flintbay.example.com
+cloudflared tunnel run --url http://localhost:19580 flintbay
 ```
 
-Set in RCH:
+Set in Flintbay:
 ```yaml
-RCH_PUBLIC_URL: "https://rch.example.com"
+FLINTBAY_PUBLIC_URL: "https://flintbay.example.com"
 ```
 
-> ⚠️ Cloudflare has a 100-second timeout on WebSocket idle connections. RCH's heartbeat (every 1s) keeps the connection alive, so this shouldn't be an issue.
+> ⚠️ Cloudflare has a 100-second timeout on WebSocket idle connections. Flintbay's heartbeat (every 1s) keeps the connection alive, so this shouldn't be an issue.
 
 ---
 
@@ -247,7 +247,7 @@ After setup, verify everything works:
 
 ```bash
 # Check HTTPS
-curl -I https://rch.example.com
+curl -I https://flintbay.example.com
 
 # Check WebSocket upgrade
 curl -i -N \
@@ -255,7 +255,7 @@ curl -i -N \
   -H "Upgrade: websocket" \
   -H "Sec-WebSocket-Version: 13" \
   -H "Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==" \
-  https://rch.example.com/api/ws
+  https://flintbay.example.com/api/ws
 ```
 
 Expected: `101 Switching Protocols`
@@ -265,9 +265,9 @@ Expected: `101 Switching Protocols`
 | Problem | Fix |
 |---------|-----|
 | WebSocket disconnects | Increase proxy timeout (`proxy_read_timeout 86400s` in Nginx) |
-| Login redirect loop | Set `RCH_PUBLIC_URL` to the exact external HTTPS origin |
-| 502 Bad Gateway | RCH container not running or wrong service name in proxy config |
-| Mixed content warnings | Ensure all traffic uses the `RCH_PUBLIC_URL` HTTPS origin |
+| Login redirect loop | Set `FLINTBAY_PUBLIC_URL` to the exact external HTTPS origin |
+| 502 Bad Gateway | Flintbay container not running or wrong service name in proxy config |
+| Mixed content warnings | Ensure all traffic uses the `FLINTBAY_PUBLIC_URL` HTTPS origin |
 | Camera video plays but lags about a second | WebRTC could not connect and LL-HLS took over; publish `8189/udp` and `8189/tcp` and open them upstream |
 | Camera video never starts | Check the Source in Connection Studio; the media port only affects which transport is used, not authorization |
-| CSRF token mismatch | Verify `RCH_PUBLIC_URL`; override cookie domain/SameSite only when required |
+| CSRF token mismatch | Verify `FLINTBAY_PUBLIC_URL`; override cookie domain/SameSite only when required |

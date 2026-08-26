@@ -1,6 +1,6 @@
 # Widget Catalog
 
-RCH includes 42 widget types across 6 categories. Every widget exposes **ports** that you bind to endpoints for real-time data flow.
+Flintbay includes 42 widget types across 6 categories. Every widget exposes **ports** that you bind to endpoints for real-time data flow.
 
 ## Port Directions
 

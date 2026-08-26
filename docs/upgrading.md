@@ -1,12 +1,12 @@
-# Upgrading RCH
+# Upgrading Flintbay
 
-RCH uses a single Docker image with an embedded database. Upgrades are simple: pull the new image and restart.
+Flintbay uses a single Docker image with an embedded database. Upgrades are simple: pull the new image and restart.
 
 ## Standard Upgrade
 
 ```bash
 # 1. Create a backup (recommended)
-docker exec rch /usr/local/bin/backup.sh
+docker exec flintbay /usr/local/bin/backup.sh
 
 # 2. Pull the latest image
 docker compose pull
@@ -28,7 +28,7 @@ alone does not apply new environment values.
 
 ## Data Persistence
 
-All data lives in the `rch_data` Docker volume:
+All data lives in the `flintbay_data` Docker volume:
 - PostgreSQL database
 - Redis persistence (RDB snapshots)
 - JWT secret key
@@ -59,7 +59,7 @@ remove the volume and start clean:
 
 ```bash
 docker compose down
-docker volume rm rch_data
+docker volume rm flintbay_data
 docker compose up -d
 ```
 
@@ -88,7 +88,7 @@ more latency. To get the low-latency path, add:
 and open the port in the host firewall or cloud security group. See
 [Live video](environment.md#live-video).
 
-### `RCH_SUPERADMIN_USERNAMES` was replaced
+### `FLINTBAY_SUPERADMIN_USERNAMES` was replaced
 
 It named a comma-separated set of accounts and configured nothing else, which left
 the deployment administrator unrecoverable without a shell if its password was
@@ -96,8 +96,8 @@ lost. It is replaced by two variables:
 
 ```yaml
 environment:
-  RCH_SUPERADMIN_USERNAME: admin         # one account, not a list
-  RCH_SUPERADMIN_PASSWORD: change-me     # defaults to "admin"
+  FLINTBAY_SUPERADMIN_USERNAME: admin         # one account, not a list
+  FLINTBAY_SUPERADMIN_PASSWORD: change-me     # defaults to "admin"
 ```
 
 The old name is **not** accepted as an alias, because its meaning changed. Startup
@@ -107,24 +107,24 @@ sets it says so at boot rather than at the first unexplained 403.
 Upgrading is safe without editing anything: both new variables default to `admin`,
 and the first boot **adopts** an existing `admin` account without touching its
 password. If your administrator account has a different name, set
-`RCH_SUPERADMIN_USERNAME` to it before restarting — otherwise that account keeps
+`FLINTBAY_SUPERADMIN_USERNAME` to it before restarting — otherwise that account keeps
 working but stops being the deployment administrator, and an `admin` account is
 created alongside it.
 
 From then on the account is reconciled with the environment on every start: created
 if absent, reactivated if disabled, and its password reapplied whenever
-`RCH_SUPERADMIN_PASSWORD` changes. That last part is the recovery path — lost the
+`FLINTBAY_SUPERADMIN_PASSWORD` changes. That last part is the recovery path — lost the
 password, change the variable and restart.
 
 ## Backup Before Upgrade
 
 ```bash
 # Create backup
-docker exec rch /usr/local/bin/backup.sh
+docker exec flintbay /usr/local/bin/backup.sh
 
-# Backups are stored in the volume at /var/lib/rch/backups/
+# Backups are stored in the volume at /var/lib/flintbay/backups/
 # List backups:
-docker exec rch ls -la /var/lib/rch/backups/
+docker exec flintbay ls -la /var/lib/flintbay/backups/
 ```
 
 Backups are auto-pruned after 7 days.
@@ -134,9 +134,9 @@ Backups are auto-pruned after 7 days.
 If something goes wrong:
 
 ```bash
-docker exec rch bash -c 'gunzip -c /var/lib/rch/backups/pg_YYYYMMDD_HHMMSS.sql.gz | \
-  PGPASSWORD=$(cat /var/lib/rch/.postgres_password) \
-  /usr/lib/postgresql/17/bin/psql -h localhost -U rch -d rch'
+docker exec flintbay bash -c 'gunzip -c /var/lib/flintbay/backups/pg_YYYYMMDD_HHMMSS.sql.gz | \
+  PGPASSWORD=$(cat /var/lib/flintbay/.postgres_password) \
+  /usr/lib/postgresql/17/bin/psql -h localhost -U flintbay -d flintbay'
 ```
 
 ## Pinning a Version
@@ -145,8 +145,8 @@ If you want to stay on a specific version instead of `latest`:
 
 ```yaml
 services:
-  rch:
-    image: ghcr.io/kwaadx/rch:1.2.0  # pin to specific version
+  flintbay:
+    image: ghcr.io/flintbayhq/server:1.2.0  # pin to specific version
 ```
 
 ## ARM64 (Jetson / Raspberry Pi)
@@ -158,8 +158,8 @@ Then select the ARM64 tag explicitly:
 
 ```yaml
 services:
-  rch:
-    image: ghcr.io/kwaadx/rch:latest-arm64
+  flintbay:
+    image: ghcr.io/flintbayhq/server:latest-arm64
 ```
 
 ```bash
@@ -171,8 +171,8 @@ docker compose up -d
 
 | Problem | Fix |
 |---------|-----|
-| Container won't start after upgrade | Check logs: `docker logs rch` — usually a migration issue |
+| Container won't start after upgrade | Check logs: `docker logs flintbay` — usually a migration issue |
 | "cannot be upgraded by this version" | The volume predates 2026-07-25. See [Volumes created before 2026-07-25](#volumes-created-before-2026-07-25) — do not restart, it will not help |
-| "relation does not exist" during migration | Restarting repeats the same failure. Check `docker logs rch` for the recorded schema version and compare against the section above |
+| "relation does not exist" during migration | Restarting repeats the same failure. Check `docker logs flintbay` for the recorded schema version and compare against the section above |
 | Lost data after upgrade | You deleted the volume. Restore from backup if available |
 | Want to rollback | Stop container, change image tag to previous version, start |

@@ -1,11 +1,11 @@
 # API Keys
 
-API keys (Personal Access Tokens) let you authenticate with the RCH API and MCP server without a browser session. Use them for AI integrations, scripts, and automation.
+API keys (Personal Access Tokens) let you authenticate with the Flintbay API and MCP server without a browser session. Use them for AI integrations, scripts, and automation.
 
 ## Who Can Manage Keys
 
 Key management requires a **deployment administrator** session — the account named in
-`RCH_SUPERADMIN_USERNAME`. A key carries no workspace: it authenticates its owner
+`FLINTBAY_SUPERADMIN_USERNAME`. A key carries no workspace: it authenticates its owner
 and therefore reaches every workspace that owner belongs to, so a workspace-scoped
 permission would be a narrower gate than the thing it guards. See
 [Security](security.md#deployment-administrators).
@@ -20,7 +20,7 @@ leaked key from minting more.
 3. Choose a **name**, **scope preset**, and **expiry**
 4. Copy the key immediately — it's shown only once
 
-The key format: `rch_pat_<random>` (prefix `rch_pat_` identifies it as an RCH token).
+The key format: `flintbay_pat_<random>` (prefix `flintbay_pat_` identifies it as a Flintbay token).
 
 ## Scope Presets
 
@@ -75,7 +75,7 @@ Expired keys stop working immediately. Create a new key or rotate before expiry.
 
 ```bash
 curl http://localhost:19580/api/screens \
-  -H "Authorization: Bearer rch_pat_..."
+  -H "Authorization: Bearer flintbay_pat_..."
 ```
 
 ### MCP Server (AI Integration)
@@ -83,10 +83,10 @@ curl http://localhost:19580/api/screens \
 ```json
 {
   "mcpServers": {
-    "rch": {
+    "flintbay": {
       "url": "http://localhost:19580/mcp",
       "headers": {
-        "Authorization": "Bearer rch_pat_..."
+        "Authorization": "Bearer flintbay_pat_..."
       }
     }
   }
@@ -96,10 +96,10 @@ curl http://localhost:19580/api/screens \
 ### WebSocket
 
 ```javascript
-const ws = new WebSocket("ws://localhost:19580/api/ws?token=rch_pat_...");
+const ws = new WebSocket("ws://localhost:19580/api/ws?token=flintbay_pat_...");
 ```
 
-> ⚠️ Query-string token auth is disabled by default. Set `RCH_REALTIME_ALLOW_QUERY_TOKEN=true` to enable (not recommended for production).
+> ⚠️ Query-string token auth is disabled by default. Set `FLINTBAY_REALTIME_ALLOW_QUERY_TOKEN=true` to enable (not recommended for production).
 
 ## Key Rotation
 
@@ -128,7 +128,7 @@ curl -X POST http://localhost:19580/api/api-keys/{key_id}/rotate \
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `RCH_API_KEY_MAX_KEYS_PER_USER` | `10` | Maximum keys per user |
-| `RCH_API_KEY_DEFAULT_EXPIRY_DAYS` | `90` | Default expiry when not specified |
-| `RCH_API_KEY_MAX_EXPIRY_DAYS` | `365` | Maximum allowed expiry |
-| `RCH_API_KEY_RATE_LIMIT_PER_MINUTE` | `600` | Requests per minute per key |
+| `FLINTBAY_API_KEY_MAX_KEYS_PER_USER` | `10` | Maximum keys per user |
+| `FLINTBAY_API_KEY_DEFAULT_EXPIRY_DAYS` | `90` | Default expiry when not specified |
+| `FLINTBAY_API_KEY_MAX_EXPIRY_DAYS` | `365` | Maximum allowed expiry |
+| `FLINTBAY_API_KEY_RATE_LIMIT_PER_MINUTE` | `600` | Requests per minute per key |

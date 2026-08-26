@@ -120,7 +120,7 @@ Set `history_size` in endpoint config to enable server-side ring-buffer storage.
 
 ## Demand-Aware Polling
 
-RCH is smart about resource usage. When no one is viewing a dashboard:
+Flintbay is smart about resource usage. When no one is viewing a dashboard:
 
 - **MQTT/WebSocket/ROS2** connectors suspend subscriptions — no messages processed
 - **REST** endpoints stop polling entirely
@@ -131,9 +131,9 @@ RCH is smart about resource usage. When no one is viewing a dashboard:
 **Keep subscriptions active at zero demand:**
 ```yaml
 environment:
-  RCH_MQTT_BACKGROUND_ENABLED: "on"   # Keep MQTT subscribed
-  RCH_WS_BACKGROUND_ENABLED: "on"     # Keep WebSocket subscribed
-  RCH_ROS2_BACKGROUND_ENABLED: "on"   # Keep ROS2 subscribed
+  FLINTBAY_MQTT_BACKGROUND_ENABLED: "on"   # Keep MQTT subscribed
+  FLINTBAY_WS_BACKGROUND_ENABLED: "on"     # Keep WebSocket subscribed
+  FLINTBAY_ROS2_BACKGROUND_ENABLED: "on"   # Keep ROS2 subscribed
 ```
 
 The default `edge` profile uses `off` and suspends these subscriptions until a
@@ -197,7 +197,7 @@ User clicks button
     → Command sent to endpoint
     → Device processes command
     → Device publishes new state
-    → RCH matches state to expected value
+    → Flintbay matches state to expected value
     → Widget enters CONFIRMED state (green flash)
     → Widget returns to IDLE
 ```

@@ -1,10 +1,10 @@
 services:
-  rch:
+  flintbay:
     ## Platform images are published independently. Verify the release/digest
     ## for your architecture before upgrading, especially on Jetson/RPi.
-    ##   amd64 (Intel/AMD):  ghcr.io/kwaadx/rch:latest
-    ##   arm64 (Jetson/RPi): ghcr.io/kwaadx/rch:latest-arm64
-    image: ghcr.io/kwaadx/rch:latest
+    ##   amd64 (Intel/AMD):  ghcr.io/flintbayhq/server:latest
+    ##   arm64 (Jetson/RPi): ghcr.io/flintbayhq/server:latest-arm64
+    image: ghcr.io/flintbayhq/server:latest
     ports:
       # WEB_PORT is a host-side Compose input, not an image runtime variable.
       - "${WEB_PORT:-19580}:19580"
@@ -17,118 +17,118 @@ services:
       - "${MEDIA_PORT:-8189}:${MEDIA_PORT:-8189}/udp"
       - "${MEDIA_PORT:-8189}:${MEDIA_PORT:-8189}/tcp"
     volumes:
-      - rch_data:/var/lib/rch
+      - flintbay_data:/var/lib/flintbay
     environment:
       ## ─── Public origin & profile ───────────────────────────────────────
       ## Set the externally reachable origin. HTTPS automatically derives
       ## secure cookies; CORS and MCP metadata derive from the same value.
-      RCH_PUBLIC_URL: "${RCH_PUBLIC_URL:-http://localhost:19580}"
-      RCH_RESOURCE_PROFILE: "${RCH_RESOURCE_PROFILE:-edge}"
+      FLINTBAY_PUBLIC_URL: "${FLINTBAY_PUBLIC_URL:-http://localhost:19580}"
+      FLINTBAY_RESOURCE_PROFILE: "${FLINTBAY_RESOURCE_PROFILE:-edge}"
 
       ## ─── Live video ───────────────────────────────────────────────────
       ## The media gateway is on by default; RTSP/RTMP/SRT camera Sources
       ## play as low-latency WebRTC with automatic LL-HLS fallback. The
       ## advertised media port must match the published one above.
-      RCH_MEDIA_WEBRTC_PORT: "${MEDIA_PORT:-8189}"
+      FLINTBAY_MEDIA_WEBRTC_PORT: "${MEDIA_PORT:-8189}"
 
-      ## The ICE host is derived from RCH_PUBLIC_URL. Set it only when the
+      ## The ICE host is derived from FLINTBAY_PUBLIC_URL. Set it only when the
       ## browser reaches media through a different address than the origin.
-      # RCH_MEDIA_WEBRTC_HOST: "media.example.com"
+      # FLINTBAY_MEDIA_WEBRTC_HOST: "media.example.com"
       ## Turn live video off entirely; camera Sources then stop playing.
-      # RCH_MEDIA_GATEWAY_ENABLED: "false"
+      # FLINTBAY_MEDIA_GATEWAY_ENABLED: "false"
       ## Concurrent viewers sharing one upstream pull (edge default 8).
-      # RCH_MEDIA_GATEWAY_MAX_READERS: "32"
+      # FLINTBAY_MEDIA_GATEWAY_MAX_READERS: "32"
 
       ## Keep one worker: connector/cache/runtime reload state is process-local.
-      RCH_API_WORKERS: "1"
+      FLINTBAY_API_WORKERS: "1"
 
-      ## Optional explicit networking overrides. Usually RCH_PUBLIC_URL is enough.
-      # RCH_CORS_ORIGINS: "https://dashboard.example.com"
-      # RCH_COOKIE_SECURE: "true"
-      # RCH_COOKIE_SAMESITE: "strict"
-      # RCH_COOKIE_DOMAIN: ""
-      # RCH_TRUSTED_PROXIES: "172.16.0.0/12"
+      ## Optional explicit networking overrides. Usually FLINTBAY_PUBLIC_URL is enough.
+      # FLINTBAY_CORS_ORIGINS: "https://dashboard.example.com"
+      # FLINTBAY_COOKIE_SECURE: "true"
+      # FLINTBAY_COOKIE_SAMESITE: "strict"
+      # FLINTBAY_COOKIE_DOMAIN: ""
+      # FLINTBAY_TRUSTED_PROXIES: "172.16.0.0/12"
 
       ## ─── Authentication ───────────────────────────────────────────────
       ## JWT secret is auto-generated and persisted when omitted.
-      # RCH_JWT_SECRET_KEY: "use-at-least-32-random-bytes"
-      # RCH_JWT_PREVIOUS_SECRET_KEY: ""
-      # RCH_JWT_TOKEN_EXPIRE_MINUTES: "30"
-      # RCH_SESSION_MAX_CONCURRENT: "5"
-      # RCH_SESSION_REFRESH_TOKEN_EXPIRE_DAYS: "30"
+      # FLINTBAY_JWT_SECRET_KEY: "use-at-least-32-random-bytes"
+      # FLINTBAY_JWT_PREVIOUS_SECRET_KEY: ""
+      # FLINTBAY_JWT_TOKEN_EXPIRE_MINUTES: "30"
+      # FLINTBAY_SESSION_MAX_CONCURRENT: "5"
+      # FLINTBAY_SESSION_REFRESH_TOKEN_EXPIRE_DAYS: "30"
 
       ## ─── Database & Redis ─────────────────────────────────────────────
       ## Embedded passwords are generated and persisted when omitted.
-      # RCH_POSTGRES_PASSWORD: "your-secure-password"
-      # RCH_REDIS_PASSWORD: "your-secure-password"
+      # FLINTBAY_POSTGRES_PASSWORD: "your-secure-password"
+      # FLINTBAY_REDIS_PASSWORD: "your-secure-password"
 
       ## Explicit URLs disable only the corresponding embedded daemon.
-      # RCH_DATABASE_URL: "postgresql://user:pass@host:5432/rch"
-      # RCH_REDIS_URL: "redis://:password@host:6379/0"
+      # FLINTBAY_DATABASE_URL: "postgresql://user:pass@host:5432/flintbay"
+      # FLINTBAY_REDIS_URL: "redis://:password@host:6379/0"
 
       ## ─── MCP ──────────────────────────────────────────────────────────
-      ## Enabled by default at ${RCH_PUBLIC_URL:-http://localhost:19580}/mcp.
-      # RCH_MCP_ENABLE: "false"
-      # RCH_MCP_PUBLIC_URL: "https://your-domain.example/mcp"
-      # RCH_MCP_ISSUER_URL: "https://your-domain.example/api"
-      # RCH_MCP_LOG_LEVEL: "INFO"
+      ## Enabled by default at ${FLINTBAY_PUBLIC_URL:-http://localhost:19580}/mcp.
+      # FLINTBAY_MCP_ENABLE: "false"
+      # FLINTBAY_MCP_PUBLIC_URL: "https://your-domain.example/mcp"
+      # FLINTBAY_MCP_ISSUER_URL: "https://your-domain.example/api"
+      # FLINTBAY_MCP_LOG_LEVEL: "INFO"
 
       ## ─── Resource overrides ───────────────────────────────────────────
-      ## edge defaults shown; use RCH_RESOURCE_PROFILE=balanced for larger hosts.
-      # RCH_DB_POOL_MIN: "1"
-      # RCH_DB_POOL_MAX: "5"
-      # RCH_POSTGRES_SHARED_BUFFERS: "64MB"
-      # RCH_POSTGRES_MAX_CONNECTIONS: "20"
-      # RCH_POSTGRES_WORK_MEM: "2MB"
-      # RCH_POSTGRES_MAINTENANCE_WORK_MEM: "32MB"
-      # RCH_POSTGRES_JIT: "off"
-      # RCH_REDIS_MAXMEMORY: "128mb"
-      # RCH_REDIS_MAXMEMORY_POLICY: "allkeys-lru"
+      ## edge defaults shown; use FLINTBAY_RESOURCE_PROFILE=balanced for larger hosts.
+      # FLINTBAY_DB_POOL_MIN: "1"
+      # FLINTBAY_DB_POOL_MAX: "5"
+      # FLINTBAY_POSTGRES_SHARED_BUFFERS: "64MB"
+      # FLINTBAY_POSTGRES_MAX_CONNECTIONS: "20"
+      # FLINTBAY_POSTGRES_WORK_MEM: "2MB"
+      # FLINTBAY_POSTGRES_MAINTENANCE_WORK_MEM: "32MB"
+      # FLINTBAY_POSTGRES_JIT: "off"
+      # FLINTBAY_REDIS_MAXMEMORY: "128mb"
+      # FLINTBAY_REDIS_MAXMEMORY_POLICY: "allkeys-lru"
 
       ## At zero demand, "off" suspends subscriptions; "on" keeps them active.
-      # RCH_REST_BACKGROUND_MIN_POLL_INTERVAL_MS: "5000"
-      # RCH_MQTT_BACKGROUND_ENABLED: "off"
-      # RCH_WS_BACKGROUND_ENABLED: "off"
-      # RCH_ROS2_BACKGROUND_ENABLED: "off"
+      # FLINTBAY_REST_BACKGROUND_MIN_POLL_INTERVAL_MS: "5000"
+      # FLINTBAY_MQTT_BACKGROUND_ENABLED: "off"
+      # FLINTBAY_WS_BACKGROUND_ENABLED: "off"
+      # FLINTBAY_ROS2_BACKGROUND_ENABLED: "off"
 
-      # RCH_CONNECTOR_SEND_CONCURRENCY: "4"
-      # RCH_CONNECTOR_SEND_MAX_WAITERS: "16"
-      # RCH_CONNECTOR_SEND_WAIT_TIMEOUT_MS: "250"
-      # RCH_BINDING_PROCESS_CONCURRENCY: "2"
-      # RCH_BINDING_PROCESS_MAX_WAITERS: "16"
-      # RCH_BINDING_PROCESS_WAIT_TIMEOUT_MS: "250"
-      # RCH_BINDING_INBOUND_ENDPOINT_CONCURRENCY: "4"
-      # RCH_BINDING_INBOUND_QUEUE_SIZE: "16"
-      # RCH_REALTIME_OUTBOX_CRITICAL_SIZE: "32"
-      # RCH_REALTIME_OUTBOX_STATE_KEYS: "64"
-      # RCH_REALTIME_SEND_TIMEOUT_MS: "5000"
-      # RCH_REALTIME_BROADCAST_CONCURRENCY: "8"
-      # RCH_WS_MAX_QUEUE: "8"
+      # FLINTBAY_CONNECTOR_SEND_CONCURRENCY: "4"
+      # FLINTBAY_CONNECTOR_SEND_MAX_WAITERS: "16"
+      # FLINTBAY_CONNECTOR_SEND_WAIT_TIMEOUT_MS: "250"
+      # FLINTBAY_BINDING_PROCESS_CONCURRENCY: "2"
+      # FLINTBAY_BINDING_PROCESS_MAX_WAITERS: "16"
+      # FLINTBAY_BINDING_PROCESS_WAIT_TIMEOUT_MS: "250"
+      # FLINTBAY_BINDING_INBOUND_ENDPOINT_CONCURRENCY: "4"
+      # FLINTBAY_BINDING_INBOUND_QUEUE_SIZE: "16"
+      # FLINTBAY_REALTIME_OUTBOX_CRITICAL_SIZE: "32"
+      # FLINTBAY_REALTIME_OUTBOX_STATE_KEYS: "64"
+      # FLINTBAY_REALTIME_SEND_TIMEOUT_MS: "5000"
+      # FLINTBAY_REALTIME_BROADCAST_CONCURRENCY: "8"
+      # FLINTBAY_WS_MAX_QUEUE: "8"
 
       ## Redis can share binding state, but cannot distribute runtime reloads.
-      # RCH_BINDING_STATE_BACKEND: "memory"
-      # RCH_BINDING_STATE_LOCK_WAIT_MS: "1000"
-      # RCH_ENDPOINT_STATE_BACKEND: "memory"
-      # RCH_ENDPOINT_STATE_TTL_S: "3600"
-      # RCH_ENDPOINT_STATE_STALE_THRESHOLD_S: "300"
+      # FLINTBAY_BINDING_STATE_BACKEND: "memory"
+      # FLINTBAY_BINDING_STATE_LOCK_WAIT_MS: "1000"
+      # FLINTBAY_ENDPOINT_STATE_BACKEND: "memory"
+      # FLINTBAY_ENDPOINT_STATE_TTL_S: "3600"
+      # FLINTBAY_ENDPOINT_STATE_STALE_THRESHOLD_S: "300"
 
       ## ─── Retention, push, and observability ───────────────────────────
-      # RCH_AUDIT_RETENTION_DAYS: "90"
-      # RCH_CONNECTION_LOG_RETENTION_DAYS: "7"
-      # RCH_SYSTEM_LOG_RETENTION_DAYS: "30"
-      # RCH_VAPID_PUBLIC_KEY: ""
-      # RCH_VAPID_PRIVATE_KEY: ""
-      # RCH_VAPID_CONTACT_EMAIL: "mailto:admin@example.com"
-      # RCH_INTERNAL_API_KEY: ""
-      # RCH_METRICS_ENABLED: "true"
-      # RCH_SENTRY_DSN: ""
+      # FLINTBAY_AUDIT_RETENTION_DAYS: "90"
+      # FLINTBAY_CONNECTION_LOG_RETENTION_DAYS: "7"
+      # FLINTBAY_SYSTEM_LOG_RETENTION_DAYS: "30"
+      # FLINTBAY_VAPID_PUBLIC_KEY: ""
+      # FLINTBAY_VAPID_PRIVATE_KEY: ""
+      # FLINTBAY_VAPID_CONTACT_EMAIL: "mailto:admin@example.com"
+      # FLINTBAY_INTERNAL_API_KEY: ""
+      # FLINTBAY_METRICS_ENABLED: "true"
+      # FLINTBAY_SENTRY_DSN: ""
 
       ## ─── API and diagnostics ──────────────────────────────────────────
-      # RCH_API_ENABLE_DOCS: "true"
-      # RCH_LOG_LEVEL: "WARNING"
-      # RCH_MEMPROF_ENABLED: "1"
-      # RCH_MEMPROF_TOKEN: "change-me"
+      # FLINTBAY_API_ENABLE_DOCS: "true"
+      # FLINTBAY_LOG_LEVEL: "WARNING"
+      # FLINTBAY_MEMPROF_ENABLED: "1"
+      # FLINTBAY_MEMPROF_TOKEN: "change-me"
     restart: unless-stopped
 
 volumes:
-  rch_data:
+  flintbay_data:

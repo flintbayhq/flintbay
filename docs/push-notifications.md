@@ -1,6 +1,6 @@
 # Push Notifications API
 
-RCH supports Web Push notifications. Users subscribe through the browser, and you can trigger notifications programmatically via a service-to-service endpoint.
+Flintbay supports Web Push notifications. Users subscribe through the browser, and you can trigger notifications programmatically via a service-to-service endpoint.
 
 ## How It Works
 
@@ -14,10 +14,10 @@ Set these environment variables to enable push notifications:
 
 | Variable | Description |
 |----------|-------------|
-| `RCH_VAPID_PUBLIC_KEY` | VAPID public key (base64url) |
-| `RCH_VAPID_PRIVATE_KEY` | VAPID private key (base64url) |
-| `RCH_VAPID_CONTACT_EMAIL` | Contact email for VAPID (e.g. `mailto:you@example.com`) |
-| `RCH_INTERNAL_API_KEY` | Secret key for service-to-service auth |
+| `FLINTBAY_VAPID_PUBLIC_KEY` | VAPID public key (base64url) |
+| `FLINTBAY_VAPID_PRIVATE_KEY` | VAPID private key (base64url) |
+| `FLINTBAY_VAPID_CONTACT_EMAIL` | Contact email for VAPID (e.g. `mailto:you@example.com`) |
+| `FLINTBAY_INTERNAL_API_KEY` | Secret key for service-to-service auth |
 
 Generate VAPID keys:
 
@@ -35,7 +35,7 @@ POST /api/push-subscription/notify
 
 ### Authentication
 
-Use the `X-API-Key` header with the value of your `RCH_INTERNAL_API_KEY` environment variable.
+Use the `X-API-Key` header with the value of your `FLINTBAY_INTERNAL_API_KEY` environment variable.
 
 ```bash
 curl -X POST http://localhost:19580/api/push-subscription/notify \
@@ -100,7 +100,7 @@ curl -X POST http://localhost:19580/api/push-subscription/notify \
 import httpx
 
 httpx.post(
-    "http://rch:19580/api/push-subscription/notify",
+    "http://flintbay:19580/api/push-subscription/notify",
     headers={"X-API-Key": "your-internal-api-key"},
     json={
         "workspace_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",

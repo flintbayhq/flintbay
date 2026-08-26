@@ -1,22 +1,22 @@
 # Example: ROS2 TurtleBot Control with Joystick + Camera
 
-Control a TurtleBot3 (or any ROS2 robot) from RCH — joystick for movement, live camera stream, battery indicator, and a browser stop command.
+Control a TurtleBot3 (or any ROS2 robot) from Flintbay — joystick for movement, live camera stream, battery indicator, and a browser stop command.
 
 > **Safety:** The stop widget below only publishes a zero-velocity command through the application stack. It is not a safety-rated emergency stop. Use controller-level watchdogs, motion timeouts, hardware interlocks, and a physical E-stop wherever failure could cause harm.
 
 ## Architecture
 
 ```
-RCH Dashboard ↔ rosbridge_server (WebSocket) ↔ ROS2 Topics
+Flintbay Dashboard ↔ rosbridge_server (WebSocket) ↔ ROS2 Topics
 ```
 
-RCH connects to ROS2 via [rosbridge_suite](https://github.com/RobotWebTools/rosbridge_suite), which exposes ROS2 topics over WebSocket.
+Flintbay connects to ROS2 via [rosbridge_suite](https://github.com/RobotWebTools/rosbridge_suite), which exposes ROS2 topics over WebSocket.
 
 ## Prerequisites
 
 - ROS2 Humble/Iron/Jazzy with TurtleBot3 packages
 - `rosbridge_server` running
-- RCH instance ([Getting Started](../getting-started.md))
+- Flintbay instance ([Getting Started](../getting-started.md))
 
 ## 1. Launch rosbridge
 
@@ -30,7 +30,7 @@ Default port: `9090`. Verify it's running:
 curl -i http://localhost:9090
 ```
 
-## 2. RCH Source Configuration
+## 2. Flintbay Source Configuration
 
 1. **Sources** → **+ Add Source**
 2. Configure:

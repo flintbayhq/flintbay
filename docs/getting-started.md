@@ -1,6 +1,6 @@
-# Getting Started with RCH
+# Getting Started with Flintbay
 
-Realtime Control Hub — a self-hosted dashboard for robotics and IoT. From zero to live data in 10 minutes.
+Flintbay — a self-hosted dashboard for robotics and IoT. From zero to live data in 10 minutes.
 
 ## Prerequisites
 
@@ -18,24 +18,24 @@ Create a `docker-compose.yml`:
 
 ```yaml
 services:
-  rch:
-    image: ghcr.io/kwaadx/rch:latest
+  flintbay:
+    image: ghcr.io/flintbayhq/server:latest
     ports:
       - "19580:19580"        # web UI, API, MCP
       - "8189:8189/udp"      # live video (WebRTC)
       - "8189:8189/tcp"      # live video on UDP-blocked networks
     volumes:
-      - rch_data:/var/lib/rch
+      - flintbay_data:/var/lib/flintbay
     environment:
-      RCH_PUBLIC_URL: "http://localhost:19580"
+      FLINTBAY_PUBLIC_URL: "http://localhost:19580"
     restart: unless-stopped
 
 volumes:
-  rch_data:
+  flintbay_data:
 ```
 
-For remote HTTPS access, replace `RCH_PUBLIC_URL` with the exact external
-origin. ARM64 users can select `ghcr.io/kwaadx/rch:latest-arm64`, but should
+For remote HTTPS access, replace `FLINTBAY_PUBLIC_URL` with the exact external
+origin. ARM64 users can select `ghcr.io/flintbayhq/server:latest-arm64`, but should
 verify that the independently published architecture tag matches the intended
 release before upgrading.
 
@@ -52,7 +52,7 @@ docker compose up -d
 
 Open **http://localhost:19580** — done.
 
-> Data is stored in the `rch_data` volume and survives container restarts and image updates.
+> Data is stored in the `flintbay_data` volume and survives container restarts and image updates.
 
 ## First Login
 
@@ -96,7 +96,7 @@ An endpoint is a single data channel — for MQTT, that's a topic.
 2. Configure:
    - **Name:** `Temperature`
    - **Direction:** In (subscribe)
-   - **Topic:** `rch/demo/temperature`
+   - **Topic:** `flintbay/demo/temperature`
 3. Click **Save**
 
 ## Build the Dashboard
@@ -141,13 +141,13 @@ Publish a message from any MQTT client:
 
 ```bash
 # Install: apt install mosquitto-clients (or brew install mosquitto)
-mosquitto_pub -h test.mosquitto.org -t "rch/demo/temperature" -m "23.5"
+mosquitto_pub -h test.mosquitto.org -t "flintbay/demo/temperature" -m "23.5"
 ```
 
 Or with JSON payload:
 
 ```bash
-mosquitto_pub -h test.mosquitto.org -t "rch/demo/temperature" -m '{"temp": 23.5}'
+mosquitto_pub -h test.mosquitto.org -t "flintbay/demo/temperature" -m '{"temp": 23.5}'
 ```
 
 The gauge updates in real time. Exit edit mode to see the live dashboard.

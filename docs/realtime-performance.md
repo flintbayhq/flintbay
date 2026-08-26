@@ -1,6 +1,6 @@
 # Realtime Performance Verification
 
-This page records the reproducible performance verification for RCH's bounded realtime pipeline. It is evidence for behavioral correctness under controlled load—not a universal throughput claim or production SLA.
+This page records the reproducible performance verification for Flintbay's bounded realtime pipeline. It is evidence for behavioral correctness under controlled load—not a universal throughput claim or production SLA.
 
 ## Verdict
 
@@ -34,7 +34,7 @@ Captured on **2026-07-18 at 14:53–14:54 UTC**.
 | Soak | 15 seconds |
 | Per-profile timeout | 45 seconds |
 
-The harness is dependency-free beyond RCH's own runtime. It imports the production `ConnectorSendGate`, `BindingOperationGate`, `EndpointIngressCoordinator`, `ConnectionOutbox`, and `ConnectionManager`; algorithms are not copied into a synthetic benchmark implementation.
+The harness is dependency-free beyond Flintbay's own runtime. It imports the production `ConnectorSendGate`, `BindingOperationGate`, `EndpointIngressCoordinator`, `ConnectionOutbox`, and `ConnectionManager`; algorithms are not copied into a synthetic benchmark implementation.
 
 ## Results
 
@@ -48,7 +48,7 @@ The harness is dependency-free beyond RCH's own runtime. It imports the producti
 
 ### How to read the numbers
 
-These are in-process micro/integration measurements of the realtime boundaries. They are useful for regression comparison on equivalent hardware, not as a promise that every RCH deployment will sustain the same rate.
+These are in-process micro/integration measurements of the realtime boundaries. They are useful for regression comparison on equivalent hardware, not as a promise that every Flintbay deployment will sustain the same rate.
 
 Endpoint ingress latency intentionally includes queue residence from submission to completion. The profile submits 2,048 events while allowing eight endpoints to execute concurrently and serializing each endpoint's own events. Its ~351 ms p99 therefore demonstrates bounded FIFO backlog behavior under a burst; it is not the service time of one endpoint callback.
 
@@ -74,12 +74,12 @@ The resource sampler overlapped most of the reviewed standard profile, capturing
 
 | Container | CPU min / avg / max | Memory min / avg / max |
 |---|---:|---:|
-| `rch-api` | 1.48% / 35.40% / 105.19% | 118.9 / 137.6 / 174.4 MiB |
-| `rch-db` | 0.00% / 0.43% / 2.30% | 39.0 / 39.3 / 40.5 MiB |
-| `rch-redis` | 0.36% / 0.73% / 2.61% | 8.0 / 8.5 / 9.0 MiB |
-| `rch-web` (development only) | 0.16% / 0.19% / 0.25% | 212.9 / 213.3 / 213.8 MiB |
+| `flintbay-api` | 1.48% / 35.40% / 105.19% | 118.9 / 137.6 / 174.4 MiB |
+| `flintbay-db` | 0.00% / 0.43% / 2.30% | 39.0 / 39.3 / 40.5 MiB |
+| `flintbay-redis` | 0.36% / 0.73% / 2.61% | 8.0 / 8.5 / 9.0 MiB |
+| `flintbay-web` (development only) | 0.16% / 0.19% / 0.25% | 212.9 / 213.3 / 213.8 MiB |
 
-`rch-api` includes both the development Uvicorn process and the temporary harness process; CPU above 100% means more than one logical CPU was used. The Vite development container is not part of the production edge footprint, where the web application is served as static assets.
+`flintbay-api` includes both the development Uvicorn process and the temporary harness process; CPU above 100% means more than one logical CPU was used. The Vite development container is not part of the production edge footprint, where the web application is served as static assets.
 
 Redis reported 1.74 MiB used memory, 6.74 MiB RSS, and a configured 256 MiB maximum. The harness itself stabilized at 75.285 MiB RSS after warm-up with a measured delta of 0.0 MiB. Short runs cannot rule out very slow leaks; longer target-device soaks remain appropriate before a high-consequence deployment.
 
@@ -100,11 +100,11 @@ Invalid presets, invalid soak durations, missing output paths, and silent output
 
 ## Reproduce
 
-The harness lives in the full RCH source tree and runs inside the development API container. It is not included in this public deployment repository or its pre-built distribution image. The commands below are therefore for maintainers and contributors who have a source checkout and the development Docker Compose stack; they cannot be run from this repository alone. The workload does not send traffic to production, staging, ngrok, or third-party systems.
+The harness lives in the full Flintbay source tree and runs inside the development API container. It is not included in this public deployment repository or its pre-built distribution image. The commands below are therefore for maintainers and contributors who have a source checkout and the development Docker Compose stack; they cannot be run from this repository alone. The workload does not send traffic to production, staging, ngrok, or third-party systems.
 
 ```bash
 set -euo pipefail
-cd /path/to/rch-source
+cd /path/to/flintbay-core
 docker compose up -d
 
 revision="$(git rev-parse HEAD)"

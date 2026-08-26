@@ -1,11 +1,11 @@
-# Example: ESP32 Temperature Sensor → MQTT → RCH Gauge
+# Example: ESP32 Temperature Sensor → MQTT → Flintbay Gauge
 
-A complete end-to-end example: ESP32 with DHT22 sensor publishes temperature via MQTT, RCH displays it on a gauge with a real-time chart.
+A complete end-to-end example: ESP32 with DHT22 sensor publishes temperature via MQTT, Flintbay displays it on a gauge with a real-time chart.
 
 ## Architecture
 
 ```
-ESP32 + DHT22 → MQTT Broker → RCH (Gauge + Chart)
+ESP32 + DHT22 → MQTT Broker → Flintbay (Gauge + Chart)
 ```
 
 ## What You Need
@@ -13,7 +13,7 @@ ESP32 + DHT22 → MQTT Broker → RCH (Gauge + Chart)
 - ESP32 dev board
 - DHT22 temperature/humidity sensor
 - MQTT broker (Mosquitto, or use `test.mosquitto.org` for testing)
-- RCH instance running ([Getting Started](../getting-started.md))
+- Flintbay instance running ([Getting Started](../getting-started.md))
 
 ## 1. ESP32 Firmware (Arduino)
 
@@ -90,7 +90,7 @@ The ESP32 publishes every 2 seconds:
 
 ## 2. MQTT Broker (if self-hosting)
 
-Quick Mosquitto setup alongside RCH:
+Quick Mosquitto setup alongside Flintbay:
 
 ```yaml
 # Add to your docker-compose.yml
@@ -110,7 +110,7 @@ listener 1883
 allow_anonymous true
 ```
 
-## 3. RCH Configuration
+## 3. Flintbay Configuration
 
 ### Create Source
 
@@ -204,7 +204,7 @@ You should see:
 | Problem | Fix |
 |---------|-----|
 | Gauge shows no data | Check payload_path matches your JSON field name |
-| Source shows disconnected | Verify broker host is reachable from RCH container |
+| Source shows disconnected | Verify broker host is reachable from Flintbay container |
 | ESP32 won't connect | Check WiFi credentials and broker IP |
 | Data arrives but chart is empty | Ensure endpoint has `history_size > 0` in config |
 
