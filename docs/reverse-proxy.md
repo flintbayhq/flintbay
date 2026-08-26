@@ -249,16 +249,19 @@ After setup, verify everything works:
 # Check HTTPS
 curl -I https://flintbay.example.com
 
-# Check WebSocket upgrade
+# Check WebSocket upgrade. The socket is per workspace, so the path carries a
+# workspace ID; any well-formed UUID is enough to prove the proxy forwards the
+# upgrade, since authentication is refused after it.
 curl -i -N \
   -H "Connection: Upgrade" \
   -H "Upgrade: websocket" \
   -H "Sec-WebSocket-Version: 13" \
   -H "Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==" \
-  https://flintbay.example.com/api/ws
+  https://flintbay.example.com/api/realtime/ws/00000000-0000-4000-8000-000000000000
 ```
 
-Expected: `101 Switching Protocols`
+Expected: `101 Switching Protocols`, or a `4xx` from the application — either proves
+the proxy passed the upgrade through. A `502` or a hang is a proxy problem.
 
 ## Troubleshooting
 

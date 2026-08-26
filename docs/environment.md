@@ -167,15 +167,13 @@ the main README's memory-profiling section for details.
 
 ## Compatibility aliases
 
-Canonical names win when both forms are present. These legacy names remain
-accepted for existing deployments:
+None. Every setting answers to exactly one name.
 
-| Legacy | Canonical |
-|---|---|
-| `FLINTBAY_SESSION_CLEANUP_CLEANUP_INTERVAL_SECONDS` | `FLINTBAY_SESSION_CLEANUP_INTERVAL_SECONDS` |
-| `FLINTBAY_SOURCE_HEALTH_HEALTH_CHECK_INTERVAL_SECONDS` | `FLINTBAY_SOURCE_HEALTH_CHECK_INTERVAL_SECONDS` |
-| `FLINTBAY_SOURCE_HEALTH_HEALTH_CHECK_TIMEOUT_SECONDS` | `FLINTBAY_SOURCE_HEALTH_CHECK_TIMEOUT_SECONDS` |
-| `FLINTBAY_STALE_THRESHOLD_S` | `FLINTBAY_ENDPOINT_STATE_STALE_THRESHOLD_S` |
+Four variables were accepted under a second spelling until the rename: three doubled
+a word, because the name was derived from a prefix plus a field, and one predated
+the `ENDPOINT_STATE_` namespace. The prefix change forced every variable to be
+rewritten by hand anyway, so the aliases guarded nothing and were removed. If you
+set one, it is ignored rather than honoured, and the setting keeps its default.
 
 Do not use retired developer-template names such as `MCP_ENABLE`, root
 `FLINTBAY_API_KEY`, or `VITE_MCP_URL`. They were not production image contracts.

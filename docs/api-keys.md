@@ -95,8 +95,24 @@ curl http://localhost:19580/api/screens \
 
 ### WebSocket
 
+The realtime socket is per workspace, so the workspace ID is part of the path:
+
 ```javascript
-const ws = new WebSocket("ws://localhost:19580/api/ws?token=flintbay_pat_...");
+// Preferred: the token travels in the subprotocol, not the URL.
+const ws = new WebSocket(
+  `ws://localhost:19580/api/realtime/ws/${workspaceId}`,
+  ["access_token", "flintbay_pat_..."],
+)
+```
+
+The server answers with the `access_token` subprotocol. A URL carrying a token is
+written to proxy logs and browser history, which is why this is the default path.
+
+```javascript
+// Query string, for local development only.
+const ws = new WebSocket(
+  `ws://localhost:19580/api/realtime/ws/${workspaceId}?token=flintbay_pat_...`,
+)
 ```
 
 > ⚠️ Query-string token auth is disabled by default. Set `FLINTBAY_REALTIME_ALLOW_QUERY_TOKEN=true` to enable (not recommended for production).

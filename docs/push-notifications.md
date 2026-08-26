@@ -35,12 +35,12 @@ POST /api/push-subscription/notify
 
 ### Authentication
 
-Use the `X-API-Key` header with the value of your `FLINTBAY_INTERNAL_API_KEY` environment variable.
+Use the `Flintbay-Api-Key` header with the value of your `FLINTBAY_INTERNAL_API_KEY` environment variable.
 
 ```bash
 curl -X POST http://localhost:19580/api/push-subscription/notify \
   -H "Content-Type: application/json" \
-  -H "X-API-Key: your-internal-api-key" \
+  -H "Flintbay-Api-Key: your-internal-api-key" \
   -d '{
     "workspace_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
     "title": "Watering Complete",
@@ -101,7 +101,7 @@ import httpx
 
 httpx.post(
     "http://flintbay:19580/api/push-subscription/notify",
-    headers={"X-API-Key": "your-internal-api-key"},
+    headers={"Flintbay-Api-Key": "your-internal-api-key"},
     json={
         "workspace_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
         "title": "🚨 Temperature Alert",

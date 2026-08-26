@@ -105,22 +105,28 @@ Either can also be queried via API.
 
 ## Rate Limiting
 
-All API endpoints are rate-limited. Limits vary by endpoint sensitivity:
+Every API endpoint is rate-limited, per client IP, with the limit set on the route
+rather than globally. Eight distinct limits are in use, from most to least
+restrictive:
 
-| Endpoint Type | Limit |
-|---------------|-------|
-| Login | 5/minute |
-| API key creation | 10/minute |
-| General API (session) | 100/minute |
-| General API (key) | 600/minute |
-| Push notifications | 60/minute |
+| Limit | Applies to |
+|---|---|
+| 5/minute | Rotating an API key, creating a workspace, exporting the audit log, purging connection logs |
+| 10/minute | Login, creating and deleting an API key |
+| 20/minute | Heavier write paths |
+| 30/minute | Most writes; push subscribe and unsubscribe; audit-log reads |
+| 60/minute | Most reads; `POST /api/push-subscription/notify` |
+| 120/minute | Binding and widget reads, which a dashboard makes in bursts |
+| 1200/minute | Realtime and telemetry paths |
+| 3000/minute | The built-in device emulator, which exists to be polled hard |
 
-Rate limit headers are included in responses:
-```
-X-RateLimit-Limit: 100
-X-RateLimit-Remaining: 97
-X-RateLimit-Reset: 1716660000
-```
+Exceeding a limit returns **429** as an RFC 7807 problem document with
+`"code": "too_many_requests"`, the same shape as every other failure this API
+answers with, and the event is written to the platform log.
+
+No `X-RateLimit-*` headers are sent. The limiter can report remaining quota in
+response headers, but that is switched off, so a client cannot see how close it is
+to a limit and should treat 429 as the signal to back off.
 
 ## Deployment Administrators
 
