@@ -20,7 +20,7 @@ Flintbay packages that reusable layer:
 - **Visual control-station builder** — arrange 42 reusable widgets for a laptop, tablet, phone, or built-in display
 - **Command feedback** — fire-and-forget, transport ACK, or execution confirmation by matching reported state
 - **Application plumbing included** — authentication, sessions, workspace RBAC, rate limits, audit logs, reconnect behavior, and persisted layouts
-- **AI-assisted configuration (MCP)** — 37 tools for creating sources, endpoints, widgets, and bindings from supported AI clients
+- **AI-assisted configuration (MCP)** — 42 tools for creating sources, endpoints, widgets, and bindings from supported AI clients
 - **Local-first** — no cloud service, subscription, or telemetry required
 
 ## What You Can Build
@@ -149,9 +149,8 @@ all-in-one image inputs.
 
 ## Monitoring (Prometheus)
 
-Flintbay exposes a `/metrics` endpoint in Prometheus format on the internal API port (19500). It is **not** exposed publicly — only accessible from within the Docker network.
-
-To scrape metrics from a Prometheus/Grafana stack running in the same Docker network:
+Flintbay serves a Prometheus exposition. Scrape it over the container network, on the
+internal API port:
 
 ```yaml
 # prometheus.yml
@@ -161,6 +160,19 @@ scrape_configs:
       - targets: ['flintbay:19500']
     metrics_path: /metrics
 ```
+
+The same exposition is also reachable from outside, unauthenticated, at
+`GET /api/metrics` on the published port `19580`. That is a property of the
+all-in-one image: it has one port and no separate internal network, so the
+exposition cannot be hidden behind the proxy without also hiding it from a
+scraper. Note the prefix — a scrape aimed at `/metrics` on `19580` is answered by
+the web UI with a cheerful `200` and no metrics in it.
+
+Restrict `/api/metrics` at your own reverse proxy or firewall if the port is
+reachable from anywhere you do not control, or set `FLINTBAY_METRICS_ENABLED=false`
+to switch the exposition off entirely. Nothing in it identifies a workspace or an
+endpoint, but it does report login attempts, session counts and the number of live
+realtime connections.
 
 Make sure both containers share a Docker network:
 
@@ -303,7 +315,7 @@ For Claude Desktop (uses the [`mcp-remote`](https://www.npmjs.com/package/mcp-re
 
 The AI handles widget creation, source setup, and bindings automatically.
 
-**37 tools** cover workspaces, widgets, sources/endpoints, bindings, payload discovery, and monitoring.
+**42 tools** cover workspaces, widgets, sources/endpoints, bindings, payload discovery, and monitoring.
 
 Set `FLINTBAY_MCP_ENABLE=false` in `docker-compose.yml` to disable the bundled MCP server.
 
