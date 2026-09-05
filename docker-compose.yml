@@ -1,10 +1,9 @@
 services:
   flintbay:
-    ## Platform images are published independently. Verify the release/digest
-    ## for your architecture before upgrading, especially on Jetson/RPi.
-    ##   amd64 (Intel/AMD):  ghcr.io/flintbayhq/server:latest
-    ##   arm64 (Jetson/RPi): ghcr.io/flintbayhq/server:latest-arm64
-    image: ghcr.io/flintbayhq/server:latest
+    ## One multi-architecture image covers amd64 and arm64 (Jetson/RPi); Docker
+    ## picks the variant matching the host. Pin an explicit version or an index
+    ## digest in production — see docs/upgrading.md.
+    image: ghcr.io/flintbayhq/flintbay:latest
     ports:
       # WEB_PORT is a host-side Compose input, not an image runtime variable.
       - "${WEB_PORT:-19580}:19580"
@@ -121,7 +120,6 @@ services:
       # FLINTBAY_VAPID_CONTACT_EMAIL: "mailto:admin@example.com"
       # FLINTBAY_INTERNAL_API_KEY: ""
       # FLINTBAY_METRICS_ENABLED: "true"
-      # FLINTBAY_SENTRY_DSN: ""
 
       ## ─── API and diagnostics ──────────────────────────────────────────
       # FLINTBAY_API_ENABLE_DOCS: "true"

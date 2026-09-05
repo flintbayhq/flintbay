@@ -25,7 +25,7 @@ and open it in the firewall or security group:
 
 ```yaml
   flintbay:
-    image: ghcr.io/flintbayhq/server:latest
+    image: ghcr.io/flintbayhq/flintbay:latest
     ports:
       - "8189:8189/udp"   # not proxied — direct to the container
       - "8189:8189/tcp"
@@ -74,7 +74,7 @@ services:
     restart: unless-stopped
 
   flintbay:
-    image: ghcr.io/flintbayhq/server:latest
+    image: ghcr.io/flintbayhq/flintbay:latest
     environment:
       FLINTBAY_PUBLIC_URL: "https://flintbay.example.com"
       FLINTBAY_TRUSTED_PROXIES: "172.16.0.0/12"
@@ -116,7 +116,7 @@ services:
     restart: unless-stopped
 
   flintbay:
-    image: ghcr.io/flintbayhq/server:latest
+    image: ghcr.io/flintbayhq/flintbay:latest
     environment:
       FLINTBAY_PUBLIC_URL: "https://flintbay.example.com"
       FLINTBAY_TRUSTED_PROXIES: "172.16.0.0/12"
@@ -199,7 +199,7 @@ services:
     restart: unless-stopped
 
   flintbay:
-    image: ghcr.io/flintbayhq/server:latest
+    image: ghcr.io/flintbayhq/flintbay:latest
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.flintbay.rule=Host(`flintbay.example.com`)"

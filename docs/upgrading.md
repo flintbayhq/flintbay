@@ -131,40 +131,79 @@ Backups are auto-pruned after 7 days.
 
 ## Restore from Backup
 
-If something goes wrong:
+The dump contains no `DROP` statements, so the schema has to be cleared first —
+restoring straight over a populated database fails on the first `CREATE`. Both
+commands read the container's own datastore credentials, so they work whether
+PostgreSQL is embedded or external:
 
 ```bash
-docker exec flintbay bash -c 'gunzip -c /var/lib/flintbay/backups/pg_YYYYMMDD_HHMMSS.sql.gz | \
-  PGPASSWORD=$(cat /var/lib/flintbay/.postgres_password) \
-  /usr/lib/postgresql/17/bin/psql -h localhost -U flintbay -d flintbay'
+docker exec flintbay sh -c '. /etc/flintbay-datastore.env; PGPASSWORD="$PG_PASS" \
+  psql -h "$PG_HOST" -p "$PG_PORT" -U "$PG_USER" -d "$PG_NAME" \
+  -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public;"'
+
+docker exec flintbay sh -c '. /etc/flintbay-datastore.env; gzip -dc \
+  /var/lib/flintbay/backups/pg_YYYYMMDD_HHMMSS.sql.gz | PGPASSWORD="$PG_PASS" \
+  psql -h "$PG_HOST" -p "$PG_PORT" -U "$PG_USER" -d "$PG_NAME" -v ON_ERROR_STOP=1'
+
+docker restart flintbay
 ```
+
+`ON_ERROR_STOP=1` matters: without it `psql` reports success after skipping
+statements it could not apply.
 
 ## Pinning a Version
 
-If you want to stay on a specific version instead of `latest`:
+`latest` moves when a stable version is published, and pulling it does not update
+a running container — a locally cached image may be older than the tag suggests.
+Pin an explicit version in production:
 
 ```yaml
 services:
   flintbay:
-    image: ghcr.io/flintbayhq/server:1.2.0  # pin to specific version
+    image: ghcr.io/flintbayhq/flintbay:0.2.0
+```
+
+Version tags are immutable: `0.2.0` is never rebuilt or overwritten. For a
+guarantee that survives even a registry mistake, pin the index digest instead:
+
+```yaml
+    image: ghcr.io/flintbayhq/flintbay@sha256:...
+```
+
+Resolve the digest for a tag with `docker buildx imagetools inspect
+ghcr.io/flintbayhq/flintbay:0.2.0`. When you pin, update the pin deliberately
+whenever a security release is published.
+
+### Verifying the image
+
+Each published version is signed with cosign through GitHub OIDC:
+
+```bash
+cosign verify \
+  --certificate-oidc-issuer https://token.actions.githubusercontent.com \
+  --certificate-identity-regexp '^https://github\.com/flintbayhq/flintbay-core/\.github/workflows/build\.yml@' \
+  ghcr.io/flintbayhq/flintbay:0.2.0
+```
+
+After upgrading, confirm the container is running what you intended:
+
+```bash
+docker exec flintbay cat /app/release.json
 ```
 
 ## ARM64 (Jetson / Raspberry Pi)
 
-ARM64 is published under a separate tag. Architecture tags may be built and
-published at different times, so verify the intended release/digest before
-pulling; do not assume `latest-arm64` is synchronized with amd64 `latest`.
-Then select the ARM64 tag explicitly:
+Nothing to select. Each version is one multi-architecture index covering
+`linux/amd64` and `linux/arm64`, so both architectures share the tag and the
+digest, and Docker pulls the variant matching the host. The upgrade procedure at
+the top of this page is the whole story on ARM64 too.
 
-```yaml
-services:
-  flintbay:
-    image: ghcr.io/flintbayhq/server:latest-arm64
-```
+If an ARM host reports `no matching manifest`, it is pulling through something
+that flattened the index — check for a mirror or a proxy in front of the
+registry, and confirm the platform with:
 
 ```bash
-docker compose pull
-docker compose up -d
+docker buildx imagetools inspect ghcr.io/flintbayhq/flintbay:0.2.0
 ```
 
 ## Troubleshooting Upgrades

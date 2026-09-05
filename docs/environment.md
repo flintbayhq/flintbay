@@ -28,7 +28,7 @@ and MCP are enabled; secrets are generated and persisted in `/var/lib/flintbay`.
 ```yaml
 services:
   flintbay:
-    image: ghcr.io/flintbayhq/server:latest
+    image: ghcr.io/flintbayhq/flintbay:latest
     ports:
       - "${WEB_PORT:-19580}:19580"
       - "${MEDIA_PORT:-8189}:${MEDIA_PORT:-8189}/udp"
@@ -158,8 +158,6 @@ not distribute connector caches or runtime CRUD reloads. Keep
 |---|---|
 | `FLINTBAY_VAPID_PUBLIC_KEY`, `FLINTBAY_VAPID_PRIVATE_KEY`, `FLINTBAY_VAPID_CONTACT_EMAIL` | Web Push configuration. |
 | `FLINTBAY_INTERNAL_API_KEY` | Optional service-to-service key for push notifications. |
-| `FLINTBAY_SENTRY_DSN`, `FLINTBAY_SENTRY_ENVIRONMENT`, `FLINTBAY_SENTRY_RELEASE` | Sentry-compatible error reporting. |
-| `FLINTBAY_SENTRY_TRACES_SAMPLE_RATE`, `FLINTBAY_SENTRY_PROFILES_SAMPLE_RATE` | Trace/profile sampling fractions, default `0.0`. |
 | `FLINTBAY_MEMPROF_ENABLED`, `FLINTBAY_MEMPROF_TOKEN` | Opt-in memory diagnostics; disabled by default. |
 
 See [Push Notifications](push-notifications.md), [Security](security.md), and

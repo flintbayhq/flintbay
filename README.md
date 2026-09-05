@@ -41,7 +41,7 @@ Flintbay packages that reusable layer:
 # docker-compose.yml
 services:
   flintbay:
-    image: ghcr.io/flintbayhq/server:latest        # amd64 (Intel/AMD)
+    image: ghcr.io/flintbayhq/flintbay:latest
     ports:
       - "19580:19580"                       # web UI, API, MCP
       - "8189:8189/udp"                     # live video (WebRTC)
@@ -59,15 +59,17 @@ volumes:
 
 ### Platform Images
 
-| Architecture | Image Tag | Devices |
-|---|---|---|
-| **amd64** (x86_64) | `ghcr.io/flintbayhq/server:latest` | Desktop, server, cloud VMs |
-| **arm64** (aarch64) | `ghcr.io/flintbayhq/server:latest-arm64` | Jetson Orin/Nano, Raspberry Pi 4/5 |
+`ghcr.io/flintbayhq/flintbay` is one multi-architecture image. Docker selects the
+right variant for the host, so the same tag works everywhere:
 
-> Architecture tags are published independently. Before an ARM64 upgrade,
-> verify that the selected tag/release matches the version you intend to run;
-> do not assume `latest-arm64` has the same digest or publication time as
-> `latest`.
+| Architecture | Devices |
+|---|---|
+| **amd64** (x86_64) | Desktop, server, cloud VMs |
+| **arm64** (aarch64) | Jetson Orin/Nano, Raspberry Pi 4/5 |
+
+> A version tag such as `flintbay:0.2.0` is immutable and covers both
+> architectures; `latest` moves only when a stable version is published.
+> Pin a version in production — see [upgrading](docs/upgrading.md).
 
 ```bash
 docker compose up -d
@@ -179,7 +181,7 @@ Make sure both containers share a Docker network:
 ```yaml
 services:
   flintbay:
-    image: ghcr.io/flintbayhq/server:latest
+    image: ghcr.io/flintbayhq/flintbay:latest
     networks: [monitoring]
   prometheus:
     image: prom/prometheus

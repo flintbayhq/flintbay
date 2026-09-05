@@ -19,7 +19,7 @@ Create a `docker-compose.yml`:
 ```yaml
 services:
   flintbay:
-    image: ghcr.io/flintbayhq/server:latest
+    image: ghcr.io/flintbayhq/flintbay:latest
     ports:
       - "19580:19580"        # web UI, API, MCP
       - "8189:8189/udp"      # live video (WebRTC)
@@ -35,9 +35,9 @@ volumes:
 ```
 
 For remote HTTPS access, replace `FLINTBAY_PUBLIC_URL` with the exact external
-origin. ARM64 users can select `ghcr.io/flintbayhq/server:latest-arm64`, but should
-verify that the independently published architecture tag matches the intended
-release before upgrading.
+origin. The tag is one multi-architecture image, so amd64 and arm64 hosts —
+including Jetson and Raspberry Pi — pull the same reference and Docker selects
+the matching variant.
 
 Port `8189` carries live camera video over WebRTC, which cannot share the HTTP
 port. Remote deployments must open it in the firewall or cloud security group
