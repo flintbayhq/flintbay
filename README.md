@@ -431,11 +431,12 @@ Change language in the sidebar → your name (bottom of the sidebar) → **User 
 - [API Keys](docs/api-keys.md) — scopes, creation, rotation
 - [Workspace Sharing](docs/workspace-sharing.md) — invite members, assign roles
 - [RTSP Stream Proxy](docs/rtsp-proxy.md) — view IP cameras in the browser
-- [Realtime Performance Verification](docs/realtime-performance.md) — reproducible load, saturation, fan-out, and soak results
+- [Realtime Performance Verification](docs/realtime-performance.md) — measured load, saturation, fan-out, and soak results
 - [Security](docs/security.md) — lockout, password policy, JWT rotation
 - [Upgrading](docs/upgrading.md) — how to update to a new version
 - [Reverse Proxy](docs/reverse-proxy.md) — HTTPS with Caddy/Nginx/Traefik
 - [Push Notifications](docs/push-notifications.md) — alerts when you're away
+- [Security Policy](SECURITY.md) — supported versions, image verification, vulnerability disclosure
 - **Examples:** [MQTT + ESP32](docs/examples/mqtt-temperature.md) · [ROS2 TurtleBot](docs/examples/ros2-turtlebot.md) · [REST Polling](docs/examples/rest-api-polling.md)
 
 ## License

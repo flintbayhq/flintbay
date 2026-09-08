@@ -98,48 +98,20 @@ A profile fails—and the CLI exits non-zero—if any of these occur:
 
 Invalid presets, invalid soak durations, missing output paths, and silent output overwrite also fail before a workload starts.
 
-## Reproduce
+## Reproducing this
 
-The harness lives in the full Flintbay source tree and runs inside the development API container. It is not included in this public deployment repository or its pre-built distribution image. The commands below are therefore for maintainers and contributors who have a source checkout and the development Docker Compose stack; they cannot be run from this repository alone. The workload does not send traffic to production, staging, ngrok, or third-party systems.
+The harness is not in this repository. It runs inside the development API container
+of the full Flintbay source tree — `pytest src/realtime/test_performance_harness.py`
+for the contract and boundary regressions, then `scripts/realtime_perf.py` with a
+named preset for the measured runs, with container resource sampling alongside the
+standard profile. Presets, soak durations and output paths are validated before a
+workload starts, and output files are never overwritten implicitly, so a published
+number always corresponds to one recorded run. The workload is fully local: no
+traffic goes to production, staging, tunnels or third-party systems.
 
-```bash
-set -euo pipefail
-cd /path/to/flintbay-core
-docker compose up -d
-
-revision="$(git rev-parse HEAD)"
-if test -n "$(git status --porcelain)"; then
-  revision="${revision}+dirty"
-fi
-
-# Fast contract and boundary regressions
-docker compose exec -T api \
-  pytest -q src/realtime/test_performance_harness.py src/realtime/test_backpressure.py
-
-# Fast smoke profile
-docker compose exec -T api \
-  python scripts/realtime_perf.py \
-  --preset smoke \
-  --revision "$revision" \
-  --output /tmp/realtime-performance-smoke.json
-
-# Reviewed standard profile plus concurrent container sampling
-scripts/resource_snapshot.sh 15 1 realtime-standard-reviewed > /tmp/realtime-resources.txt &
-snapshot_pid=$!
-docker compose exec -T api \
-  python scripts/realtime_perf.py \
-  --preset standard \
-  --revision "$revision" \
-  --output /tmp/realtime-performance-standard.json
-wait "$snapshot_pid"
-
-# Copy machine-readable evidence out of the container
-api_container="$(docker compose ps -q api)"
-docker cp "$api_container:/tmp/realtime-performance-standard.json" .
-cat /tmp/realtime-resources.txt
-```
-
-Use `--soak-seconds N` for a custom duration up to 300 seconds. Output paths are not overwritten unless `--overwrite` is explicit. The published artifact used the descriptive custom revision tag shown in the environment table; the example above records the current commit plus a generic `+dirty` suffix when applicable. For comparisons, keep the preset, hardware, Docker allocation, Python version, and background workload equivalent.
+What that means for you as an operator: these figures are a ceiling measured on the
+hardware in the environment table above, not a promise about your device. The
+section below is the part you can act on.
 
 ## What to test next
 

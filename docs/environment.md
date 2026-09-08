@@ -9,7 +9,10 @@ PostgreSQL and Redis are embedded by default and can be replaced independently.
 - Public all-in-one runtime settings use `FLINTBAY_*` and are passed through Docker
   `environment:`, `docker run -e`, or an orchestrator secret.
 - `WEB_PORT` in this repository's Compose file is only a host-side Compose
-  input. It is not passed into the container.
+  input. It is not passed into the container. If you change it, change
+  `FLINTBAY_PUBLIC_URL` to the same port: the application derives CORS origins,
+  secure-cookie behaviour and MCP metadata from `FLINTBAY_PUBLIC_URL`, and it has
+  no other way to learn which port you published.
 - `MEDIA_PORT` is a Compose input too, but unlike `WEB_PORT` it is also passed
   in as `FLINTBAY_MEDIA_WEBRTC_PORT`, because the container advertises its own media
   port number in ICE candidates and the two must agree.

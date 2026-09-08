@@ -106,7 +106,7 @@ Either can also be queried via API.
 ## Rate Limiting
 
 Every API endpoint is rate-limited, per client IP, with the limit set on the route
-rather than globally. Eight distinct limits are in use, from most to least
+rather than globally. Six distinct limits are in use, from most to least
 restrictive:
 
 | Limit | Applies to |
@@ -115,10 +115,13 @@ restrictive:
 | 10/minute | Login, creating and deleting an API key |
 | 20/minute | Heavier write paths |
 | 30/minute | Most writes; push subscribe and unsubscribe; audit-log reads |
-| 60/minute | Most reads; `POST /api/push-subscription/notify` |
+| 60/minute | Most reads; telemetry ingest; `POST /api/push-subscription/notify` |
 | 120/minute | Binding and widget reads, which a dashboard makes in bursts |
-| 1200/minute | Realtime and telemetry paths |
-| 3000/minute | The built-in device emulator, which exists to be polled hard |
+
+The realtime WebSocket at `/api/realtime/ws/{workspace_id}` is not covered by these
+limits — the limiter counts HTTP requests, and a dashboard opens one long-lived
+socket rather than polling. Authentication still applies to the socket, so an
+unauthenticated client cannot hold one open.
 
 Exceeding a limit returns **429** as an RFC 7807 problem document with
 `"code": "too_many_requests"`, the same shape as every other failure this API

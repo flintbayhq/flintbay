@@ -4,8 +4,15 @@ services:
     ## picks the variant matching the host. Pin an explicit version or an index
     ## digest in production — see docs/upgrading.md.
     image: ghcr.io/flintbayhq/flintbay:latest
+    ## Commands throughout the docs address the container by this name
+    ## (`docker exec flintbay ...`, `docker logs flintbay`). Without it Compose
+    ## would name it `flintbay-flintbay-1` and those commands would not resolve.
+    container_name: flintbay
     ports:
       # WEB_PORT is a host-side Compose input, not an image runtime variable.
+      # Changing it does not change the origin the app believes it serves, so
+      # set FLINTBAY_PUBLIC_URL to the same port — otherwise CORS, secure
+      # cookies and MCP metadata are built from the wrong origin.
       - "${WEB_PORT:-19580}:19580"
       ## Live-video transport for camera/stream Sources. WebRTC carries media
       ## over its own port because ICE is not HTTP and cannot share 19580.
@@ -23,6 +30,12 @@ services:
       ## secure cookies; CORS and MCP metadata derive from the same value.
       FLINTBAY_PUBLIC_URL: "${FLINTBAY_PUBLIC_URL:-http://localhost:19580}"
       FLINTBAY_RESOURCE_PROFILE: "${FLINTBAY_RESOURCE_PROFILE:-edge}"
+
+      ## ─── Deployment administrator ─────────────────────────────────────
+      ## Omitting both leaves the initial login at admin / admin. Set them
+      ## before the deployment is reachable by anyone but you.
+      # FLINTBAY_SUPERADMIN_USERNAME: "admin"
+      # FLINTBAY_SUPERADMIN_PASSWORD: "replace-with-a-strong-password"
 
       ## ─── Live video ───────────────────────────────────────────────────
       ## The media gateway is on by default; RTSP/RTMP/SRT camera Sources
@@ -127,6 +140,17 @@ services:
       # FLINTBAY_MEMPROF_ENABLED: "1"
       # FLINTBAY_MEMPROF_TOKEN: "change-me"
     restart: unless-stopped
+    ## Embedded PostgreSQL needs time for a clean shutdown; the default 10s
+    ## can cut a checkpoint short.
+    stop_grace_period: 30s
+    security_opt:
+      - no-new-privileges:true
+    ## Bound the container log so a chatty connector cannot fill the disk.
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
 
 volumes:
   flintbay_data:

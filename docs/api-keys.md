@@ -26,20 +26,23 @@ The key format: `flintbay_pat_<random>` (prefix `flintbay_pat_` identifies it as
 
 | Preset | What It Can Do | Use Case |
 |--------|---------------|----------|
-| **read-only** | View screens, pages, widgets, bindings, sources, logs | Monitoring dashboards, read-only integrations |
-| **dashboard** | Full CRUD on screens, pages, widgets, bindings, sources, endpoints | AI assistants (MCP), automation scripts |
+| **read-only** | View screens, pages, widgets, bindings, sources, logs, and workspace members | Monitoring dashboards, read-only integrations |
+| **dashboard** | Full CRUD on screens, pages, widgets, bindings, sources, endpoints — but cannot see the member list | AI assistants (MCP), automation scripts |
 | **full** | Everything including workspace management, user admin, member management | Admin automation, CI/CD |
 
 ### Detailed Scopes
 
-**read-only** includes:
+The presets are not nested: `dashboard` is not `read-only` plus writes — it trades
+`member:view` for the ability to change things. Each list below is complete.
+
+**read-only** (9 scopes):
 `screen:view`, `page:view`, `widget:view`, `binding:view`, `endpoint:view`, `source:view`, `audit_log:view`, `telemetry:view`, `member:view`
 
-**dashboard** adds:
-`screen:create/update/delete`, `page:create/update/delete`, `widget:create/update/delete/interact`, `binding:create/update/delete`, `endpoint:create/update/delete`, `source:create/update/delete`
+**dashboard** (29 scopes) — every `read-only` scope except `member:view`, plus:
+`screen:create/update/delete/set_default`, `page:create/update/delete/set_default`, `widget:create/update/delete/interact`, `binding:create/update/delete`, `endpoint:create/update/delete`, `source:create/update/delete`
 
-**full** adds:
-`workspace:update/delete`, `audit_log:admin`, `user:admin`, `connection_log:admin`, `member:invite/remove/update_role`, `api_key:manage`
+**full** (40 scopes) — every `dashboard` scope, plus `member:view` and:
+`workspace:update/delete/set_default`, `audit_log:admin`, `user:admin`, `connection_log:admin`, `member:invite/remove/update_role`, `api_key:manage`
 
 > A key never exceeds its owner: a request through it must pass both the key's scopes **and** the
 > owner's role in the workspace it addresses. Scopes narrow, they do not grant.
