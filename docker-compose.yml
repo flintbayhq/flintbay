@@ -134,6 +134,16 @@ services:
       # FLINTBAY_INTERNAL_API_KEY: ""
       # FLINTBAY_METRICS_ENABLED: "true"
 
+      ## ─── Update check ─────────────────────────────────────────────────
+      ## Once a day the deployment reads a static JSON file listing published
+      ## releases and compares it with its own version, so the interface can
+      ## show that a newer one exists. The comparison happens here: no version,
+      ## identifier or fingerprint is sent, and nothing is installed
+      ## automatically. Set to "false" and no outbound request is ever made.
+      # FLINTBAY_UPDATE_ENABLED: "false"
+      # FLINTBAY_UPDATE_URL: "https://flintbay.io/releases.json"
+      # FLINTBAY_UPDATE_INTERVAL_HOURS: "24"
+
       ## ─── API and diagnostics ──────────────────────────────────────────
       # FLINTBAY_API_ENABLE_DOCS: "true"
       # FLINTBAY_LOG_LEVEL: "WARNING"

@@ -82,6 +82,28 @@ query, or fragment.
 | `FLINTBAY_MCP_PUBLIC_URL` | `${FLINTBAY_PUBLIC_URL}/mcp` | Optional public MCP resource URL override. |
 | `FLINTBAY_MCP_ISSUER_URL` | `${FLINTBAY_PUBLIC_URL}/api` | Optional MCP authorization-server/API URL override. |
 | `FLINTBAY_MCP_LOG_LEVEL` | `INFO` | Bundled MCP log level. |
+| `FLINTBAY_UPDATE_ENABLED` | `true` | Whether to look for newer releases at all. `false` means no outbound request is ever made. |
+| `FLINTBAY_UPDATE_URL` | `https://flintbay.io/releases.json` | Release feed to read. Must be HTTPS. |
+| `FLINTBAY_UPDATE_INTERVAL_HOURS` | `24` | How often the feed is re-read. |
+| `FLINTBAY_UPDATE_TIMEOUT_SECONDS` | `10` | How long one feed request may take. |
+
+### What the update check does and does not do
+
+Once per interval the deployment performs one unauthenticated `GET` of a static JSON document
+listing published releases, and compares the newest applicable one with the version its own image
+reports. The comparison happens on the deployment: the request carries no version, no deployment
+identifier and no fingerprint, so reading the feed tells the other end nothing about who read it.
+Nothing is downloaded and nothing is installed — the result is a line in the interface saying a
+newer version exists, and upgrading remains an operator action.
+
+A deployment that cannot reach the feed is a working deployment. Failures are silent by design: no
+banner, no exception, and at most one throttled entry in the platform log. An air-gapped
+installation can leave the setting on and simply never sees the indicator, or set
+`FLINTBAY_UPDATE_ENABLED=false` and skip the attempt entirely.
+
+A deployment running a prerelease is offered prereleases, because running one is the opt-in. A
+stable deployment is only ever offered stable releases. A deployment built from a source checkout
+reports its version as `dev` and is never told it is behind.
 
 ## Live video
 
