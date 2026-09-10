@@ -49,9 +49,18 @@ The presets are not nested: `dashboard` is not `read-only` plus writes — it tr
 
 ## Allow Destructive
 
-The `allow_destructive` flag controls whether the key can perform delete operations. Even with `dashboard` scope, a key with `allow_destructive: false` cannot delete screens, pages, or widgets — only create and update.
+`allow_destructive` decides whether the key may delete anything, and it is a blunt instrument on
+purpose: for a request authenticated by an API key, the flag being `false` refuses **any request whose
+HTTP method is `DELETE`**, whatever the key's scopes say. It is not a per-resource rule, so a
+`dashboard` key without it can create and update screens, pages, widgets, bindings, endpoints and
+sources, and delete none of them.
 
-Default: **false** (safe by default).
+It has one further effect that is easy to miss: applying a Connection Studio plan that reuses an
+existing binding group needs `binding:update`, and a key without `allow_destructive` is refused
+there too — even though applying a plan is a `POST`. Reusing a group rewrites what an existing widget
+is bound to, which is destructive in the sense that matters.
+
+Default: **false**. Rotation preserves the flag.
 
 ## Expiry
 
@@ -65,12 +74,18 @@ Expired keys stop working immediately. Create a new key or rotate before expiry.
 
 ## Rate Limits
 
-| Limit | Value |
+Requests made **with** a key are limited exactly like any other request: per route, and keyed by
+client address. There is no per-key quota — a key is an identity, not a bucket.
+
+Key *management* is limited separately, because each of these costs a database write and one of them
+hands out a new secret:
+
+| Route | Limit |
 |-------|-------|
-| Requests per key | 600/minute |
-| Key creation | 10/minute |
-| Key listing | 30/minute |
-| Key rotation | 5/minute |
+| Create | 10/minute |
+| List | 30/minute |
+| Revoke | 10/minute |
+| Rotate | 5/minute |
 
 ## Using a Key
 
@@ -150,4 +165,8 @@ curl -X POST http://localhost:19580/api/api-keys/{key_id}/rotate \
 | `FLINTBAY_API_KEY_MAX_KEYS_PER_USER` | `10` | Maximum keys per user |
 | `FLINTBAY_API_KEY_DEFAULT_EXPIRY_DAYS` | `90` | Default expiry when not specified |
 | `FLINTBAY_API_KEY_MAX_EXPIRY_DAYS` | `365` | Maximum allowed expiry |
-| `FLINTBAY_API_KEY_RATE_LIMIT_PER_MINUTE` | `600` | Requests per minute per key |
+| `FLINTBAY_API_KEY_LAST_USED_THROTTLE_SECONDS` | `60` | How often `last_used_at` is written back |
+
+`FLINTBAY_API_KEY_RATE_LIMIT_PER_MINUTE` also exists and is deliberately not listed as a setting:
+nothing reads it. Setting it changes no behaviour. Rate limiting is per route and per client address,
+as described above.

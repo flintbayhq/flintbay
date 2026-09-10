@@ -423,21 +423,38 @@ Change language in the sidebar → your name (bottom of the sidebar) → **User 
 
 ## Documentation
 
-- [Environment Variables](docs/environment.md) — production namespaces, precedence, profiles, and operator settings
-- [Getting Started](docs/getting-started.md) — zero to live data in 10 minutes
-- [Widget Catalog](docs/widgets.md) — all 42 widget types with ports
-- [Bindings Guide](docs/bindings.md) — connecting widgets to data (directions, payload_path, history, ACK)
-- [Data Transforms](docs/transforms.md) — scale, map, filter incoming data
-- [API Keys](docs/api-keys.md) — scopes, creation, rotation
-- [Workspace Sharing](docs/workspace-sharing.md) — invite members, assign roles
-- [RTSP Stream Proxy](docs/rtsp-proxy.md) — view IP cameras in the browser
-- [Realtime Performance Verification](docs/realtime-performance.md) — measured load, saturation, fan-out, and soak results
-- [Security](docs/security.md) — lockout, password policy, JWT rotation
-- [Upgrading](docs/upgrading.md) — how to update to a new version
-- [Reverse Proxy](docs/reverse-proxy.md) — HTTPS with Caddy/Nginx/Traefik
-- [Push Notifications](docs/push-notifications.md) — alerts when you're away
-- [Security Policy](SECURITY.md) — supported versions, image verification, vulnerability disclosure
-- **Examples:** [MQTT + ESP32](docs/examples/mqtt-temperature.md) · [ROS2 TurtleBot](docs/examples/ros2-turtlebot.md) · [REST Polling](docs/examples/rest-api-polling.md)
+**Start here**
+
+- [Getting Started](docs/getting-started.md) — zero to live data in ten minutes
+- [Widget Catalog](docs/widgets.md) — all 42 widget types and their ports
+- [Bindings](docs/bindings.md) — connecting widgets to data: directions, `payload_path`, history, ACK
+- [Data Transforms](docs/transforms.md) — the 13 transforms, with recipes
+
+**Worked examples**
+
+- [MQTT + ESP32](docs/examples/mqtt-temperature.md) — a temperature sensor to a gauge
+- [ROS 2 TurtleBot](docs/examples/ros2-turtlebot.md) — joystick, camera and an emergency stop
+- [REST Polling](docs/examples/rest-api-polling.md) — an HTTP API to a chart
+
+**Running a deployment**
+
+- [Environment Variables](docs/environment.md) — the contract, precedence, resource profiles, live video
+- [Reverse Proxy](docs/reverse-proxy.md) — HTTPS with Caddy, Nginx, Traefik or a Cloudflare tunnel
+- [Security Configuration](docs/security.md) — lockout, password policy, JWT rotation, audit retention
+- [Upgrading](docs/upgrading.md) — what changes on startup, and what a volume keeps
+- [Changelog](CHANGELOG.md) — what shipped in each version, and which image it is
+
+**Integrating**
+
+- [API Keys](docs/api-keys.md) — scope presets, `allow_destructive`, rotation
+- [Workspace Sharing](docs/workspace-sharing.md) — roles, invitations, isolation
+- [Push Notifications](docs/push-notifications.md) — Web Push for alerts when the tab is closed
+- [RTSP Stream Proxy](docs/rtsp-proxy.md) — an IP camera in a widget, and why a media Source is better
+
+**Evidence and policy**
+
+- [Realtime Performance](docs/realtime-performance.md) — measured load, saturation, fan-out and soak results
+- [Security Policy](SECURITY.md) — supported versions, image signature verification, reporting a vulnerability
 
 ## License
 

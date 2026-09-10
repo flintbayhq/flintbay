@@ -1,10 +1,10 @@
-# Environment variables
+# Environment Variables
 
 This page documents the supported environment contract for the Flintbay all-in-one
 image. The image contains the API, Web UI, Caddy, MCP, PostgreSQL, and Redis.
 PostgreSQL and Redis are embedded by default and can be replaced independently.
 
-## Contract and precedence
+## Contract and Precedence
 
 - Public all-in-one runtime settings use `FLINTBAY_*` and are passed through Docker
   `environment:`, `docker run -e`, or an orchestrator secret.
@@ -26,7 +26,7 @@ PostgreSQL and Redis are embedded by default and can be replaced independently.
 The image starts with zero required configuration. Embedded services, metrics,
 and MCP are enabled; secrets are generated and persisted in `/var/lib/flintbay`.
 
-## Recommended deployment baseline
+## Recommended Deployment Baseline
 
 ```yaml
 services:
@@ -54,7 +54,7 @@ it to the real HTTPS origin whenever users access Flintbay through another host.
 The value must be an `http://` or `https://` origin without credentials, path,
 query, or fragment.
 
-## Common operator settings
+## Common Operator Settings
 
 | Variable | Default | Purpose |
 |---|---|---|
@@ -87,7 +87,7 @@ query, or fragment.
 | `FLINTBAY_UPDATE_INTERVAL_HOURS` | `24` | How often the feed is re-read. |
 | `FLINTBAY_UPDATE_TIMEOUT_SECONDS` | `10` | How long one feed request may take. |
 
-### What the update check does and does not do
+### What the Update Check Does and Does Not Do
 
 Once per interval the deployment performs one unauthenticated `GET` of a static JSON document
 listing published releases, and compares the newest applicable one with the version its own image
@@ -105,7 +105,7 @@ A deployment running a prerelease is offered prereleases, because running one is
 stable deployment is only ever offered stable releases. A deployment built from a source checkout
 reports its version as `dev` and is never told it is behind.
 
-## Live video
+## Live Video
 
 Camera and stream Sources that speak `rtsp://`, `rtmp://` or `srt://` are pulled
 once by the image's media gateway and delivered to every viewer as WebRTC, with
@@ -144,7 +144,7 @@ Direct browser-playable URLs (HLS, DASH, WHEP, MJPEG) are unaffected and never
 pass through the gateway. Legacy `rtsp://` URLs typed straight into a widget
 still use the older ffmpeg proxy described in [RTSP proxy](rtsp-proxy.md).
 
-## Resource profiles
+## Resource Profiles
 
 The default `edge` profile minimizes idle resource use. `balanced` keeps the
 previous always-on connector behavior and raises pool/concurrency limits.
@@ -169,7 +169,7 @@ previous always-on connector behavior and raises pool/concurrency limits.
 | `FLINTBAY_REALTIME_BROADCAST_CONCURRENCY` | `8` | `16` |
 | `FLINTBAY_WS_MAX_QUEUE` | `8` | `32` |
 
-With zero UI demand, `edge` suspends MQTT/WebSocket/ROS2 subscriptions and
+With zero UI demand, `edge` suspends MQTT/WebSocket/ROS 2 subscriptions and
 clamps REST polling. `on` keeps a protocol active at zero demand. Endpoints with
 `history_size > 0` remain active in either profile to collect chart history.
 
@@ -177,7 +177,7 @@ clamps REST polling. `on` keeps a protocol active at zero demand. Endpoints with
 not distribute connector caches or runtime CRUD reloads. Keep
 `FLINTBAY_API_WORKERS=1` even when using Redis binding state.
 
-## Push, observability, and diagnostics
+## Push, Observability, and Diagnostics
 
 | Variables | Purpose |
 |---|---|
@@ -188,7 +188,7 @@ not distribute connector caches or runtime CRUD reloads. Keep
 See [Push Notifications](push-notifications.md), [Security](security.md), and
 the main README's memory-profiling section for details.
 
-## Compatibility aliases
+## Compatibility Aliases
 
 None. Every setting answers to exactly one name.
 

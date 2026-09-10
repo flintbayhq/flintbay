@@ -237,7 +237,7 @@ Transforms execute left-to-right. Output of one feeds into the next.
 }
 ```
 
-### Joystick → ROS2 Twist velocity
+### Joystick → ROS 2 Twist velocity
 
 ```json
 {

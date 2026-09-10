@@ -1,20 +1,20 @@
-# Example: ROS2 TurtleBot Control with Joystick + Camera
+# Example: ROS 2 TurtleBot Control with Joystick + Camera
 
-Control a TurtleBot3 (or any ROS2 robot) from Flintbay — joystick for movement, live camera stream, battery indicator, and a browser stop command.
+Control a TurtleBot3 (or any ROS 2 robot) from Flintbay — joystick for movement, live camera stream, battery indicator, and a browser stop command.
 
 > **Safety:** The stop widget below only publishes a zero-velocity command through the application stack. It is not a safety-rated emergency stop. Use controller-level watchdogs, motion timeouts, hardware interlocks, and a physical E-stop wherever failure could cause harm.
 
 ## Architecture
 
 ```
-Flintbay Dashboard ↔ rosbridge_server (WebSocket) ↔ ROS2 Topics
+Flintbay Dashboard ↔ rosbridge_server (WebSocket) ↔ ROS 2 Topics
 ```
 
-Flintbay connects to ROS2 via [rosbridge_suite](https://github.com/RobotWebTools/rosbridge_suite), which exposes ROS2 topics over WebSocket.
+Flintbay connects to ROS 2 via [rosbridge_suite](https://github.com/RobotWebTools/rosbridge_suite), which exposes ROS 2 topics over WebSocket.
 
 ## Prerequisites
 
-- ROS2 Humble/Iron/Jazzy with TurtleBot3 packages
+- ROS 2 Humble/Iron/Jazzy with TurtleBot3 packages
 - `rosbridge_server` running
 - Flintbay instance ([Getting Started](../getting-started.md))
 
@@ -35,7 +35,7 @@ curl -i http://localhost:9090
 1. **Sources** → **+ Add Source**
 2. Configure:
    - **Name:** `TurtleBot`
-   - **Protocol:** ROS2
+   - **Protocol:** ROS 2
    - **Bridge URL:** `ws://192.168.1.50:9090` (your rosbridge host)
 3. **Save**
 
@@ -151,7 +151,7 @@ For compressed image topics, use the WStream widget with the rosbridge video str
 
 ## Testing Without a Robot
 
-Use ROS2 CLI to simulate:
+Use ROS 2 CLI to simulate:
 
 ```bash
 # Simulate battery at 75%
@@ -179,7 +179,7 @@ ros2 topic pub /odom nav_msgs/msg/Odometry \
 - Set joystick `deadzone` param to 10–15% to prevent drift commands
 - Use `lowpass` transform on odometry for smoother compass movement
 - Set velocity endpoint `queue_size: 1` to always send latest command
-- ROS2 background mode `off` is recommended for high-rate topics like `/scan` — saves bandwidth when not viewing
+- ROS 2 background mode `off` is recommended for high-rate topics like `/scan` — saves bandwidth when not viewing
 
 ## Next Steps
 

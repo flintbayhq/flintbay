@@ -102,7 +102,7 @@ Set `history_size` in endpoint config to enable server-side ring-buffer storage.
 }
 ```
 
-**ROS2 endpoints:**
+**ROS 2 endpoints:**
 ```json
 {
   "message_type": "geometry_msgs/Twist",
@@ -122,7 +122,7 @@ Set `history_size` in endpoint config to enable server-side ring-buffer storage.
 
 Flintbay is smart about resource usage. When no one is viewing a dashboard:
 
-- **MQTT/WebSocket/ROS2** connectors suspend subscriptions — no messages processed
+- **MQTT/WebSocket/ROS 2** connectors suspend subscriptions — no messages processed
 - **REST** endpoints stop polling entirely
 - When a user opens the page, connectors resume instantly
 
@@ -133,7 +133,7 @@ Flintbay is smart about resource usage. When no one is viewing a dashboard:
 environment:
   FLINTBAY_MQTT_BACKGROUND_ENABLED: "on"   # Keep MQTT subscribed
   FLINTBAY_WS_BACKGROUND_ENABLED: "on"     # Keep WebSocket subscribed
-  FLINTBAY_ROS2_BACKGROUND_ENABLED: "on"   # Keep ROS2 subscribed
+  FLINTBAY_ROS2_BACKGROUND_ENABLED: "on"   # Keep ROS 2 subscribed
 ```
 
 The default `edge` profile uses `off` and suspends these subscriptions until a
@@ -233,6 +233,6 @@ Mapping 2: WProgressBar (%) → transform: map_range [0,4095] → [0,100]
 - **One endpoint, many widgets**: Use multiple mappings in one binding group
 - **Same widget, multiple endpoints**: Create separate binding groups for each endpoint
 - **Charts need history**: Always set `history_size` on endpoints feeding WChart/WSparkline
-- **Joystick → ROS2**: Use `throttle` policy to limit message rate, `deadzone` transform to eliminate drift
+- **Joystick → ROS 2**: Use `throttle` policy to limit message rate, `deadzone` transform to eliminate drift
 - **Toggle feedback**: Use `bidir` direction so the switch reflects actual device state, not just what you clicked
 - **Debugging**: Use the endpoint's "Last Payload" viewer to see what data is arriving, then set your payload_path accordingly

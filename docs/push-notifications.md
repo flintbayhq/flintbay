@@ -10,20 +10,29 @@ Flintbay supports Web Push notifications. Users subscribe through the browser, a
 
 ## Setup
 
-Set these environment variables to enable push notifications:
+Nothing here works until all four are set. Push is off by default, and the failure it produces if you
+set some but not others is unhelpful — see below.
 
 | Variable | Description |
 |----------|-------------|
 | `FLINTBAY_VAPID_PUBLIC_KEY` | VAPID public key (base64url) |
 | `FLINTBAY_VAPID_PRIVATE_KEY` | VAPID private key (base64url) |
-| `FLINTBAY_VAPID_CONTACT_EMAIL` | Contact email for VAPID (e.g. `mailto:you@example.com`) |
-| `FLINTBAY_INTERNAL_API_KEY` | Secret key for service-to-service auth |
+| `FLINTBAY_VAPID_CONTACT_EMAIL` | Contact email for VAPID, e.g. `mailto:you@example.com` |
+| `FLINTBAY_INTERNAL_API_KEY` | Shared secret for the `notify` route |
 
 Generate VAPID keys:
 
 ```bash
 npx web-push generate-vapid-keys
 ```
+
+> **`notify` answers `500`, not `401`, when `FLINTBAY_INTERNAL_API_KEY` is unset.** The route cannot
+> tell a wrong key from an unconfigured server without saying which, so an absent secret is reported
+> as a server fault — `INTERNAL_API_KEY is not configured on the server`. If you are getting a 500
+> from a request you believe is correct, check that variable before anything else.
+>
+> Missing VAPID keys fail differently and later: subscribing appears to work, and delivery fails per
+> subscription when `notify` tries to sign the message.
 
 ## Sending Notifications
 

@@ -164,7 +164,7 @@ Workspace
 ## Next Steps
 
 - [MQTT + ESP32 Example](./examples/mqtt-temperature.md) — full hardware tutorial
-- [ROS2 TurtleBot Control](./examples/ros2-turtlebot.md) — joystick + camera
+- [ROS 2 TurtleBot Control](./examples/ros2-turtlebot.md) — joystick + camera
 - [REST API Polling](./examples/rest-api-polling.md) — chart with live data
 - [Widget Catalog](./widgets.md) — all 42 widget types
 - [Data Transforms](./transforms.md) — scale, map, filter incoming data
