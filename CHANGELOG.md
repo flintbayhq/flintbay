@@ -11,6 +11,15 @@ about the deployment is sent anywhere.
 Headings are the bare version, so the anchor for a version is its number without the dots:
 `#012` for 0.1.2.
 
+## 0.1.3
+
+Released 2026-09-13.
+
+- Connection Studio can now preview the first payload from an expanded readable endpoint and show
+  its observed fields.
+- Connecting fields to widgets now gives clearer waiting, error, and retry feedback.
+- Media widgets and controls are more polished and resilient.
+
 ## 0.1.2
 
 Released 2026-09-10.
