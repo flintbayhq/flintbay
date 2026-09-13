@@ -1,6 +1,25 @@
 # Bindings — Connecting Widgets to Data
 
-Bindings are the core mechanism that connects your UI widgets to live device data. A binding links a widget port to an endpoint, defining how data flows between your dashboard and your hardware.
+A connection carries data between an endpoint field and a widget port. For the ordinary path, use
+Connection Studio: pick the field in **Data**, pick the port in **Widgets**, and choose **Connect**.
+Flintbay creates or reuses the underlying Binding Group and Mapping for you.
+
+## Connect a Field to a Port
+
+1. Open the dashboard page that contains the widget, then open **Connection Studio**.
+2. In **Data**, expand a Source and Endpoint and select the field you want to use.
+3. In **Widgets**, expand the widget and select its destination port.
+4. Review the proposed direction and choose **Connect**.
+
+Connection Studio can also start from the widget port and then ask for a field. When you expand a
+readable Endpoint with no stored payload, Connection Studio starts a short preview and waits for its
+first frame. Publish or fetch a sample while that Endpoint is expanded; its nested JSON fields appear
+as soon as the frame arrives. If the preview times out or the connector fails, use the Endpoint's
+refresh action to try again.
+
+For example, after an Endpoint observes `{"temperature": 23.5}`, connect its `temperature` field to
+a Gauge's `value` port. Advanced editors remain available when you need to control grouping,
+payload paths, transforms, triggers, delivery policy, history, or acknowledgement.
 
 ## Architecture
 
@@ -12,7 +31,9 @@ Source → Endpoint → Binding Group → Binding Mapping → Widget Port
 
 ## Binding Groups
 
-A binding group connects **one endpoint** to **one or more widget ports**. It defines the overall direction of data flow.
+A binding group connects **one endpoint** to **one or more widget ports**. It defines the overall
+direction of data flow. Connection Studio creates or reuses a suitable group for a normal
+field-to-port connection; edit the group directly for advanced behavior.
 
 ### Directions
 
@@ -22,20 +43,19 @@ A binding group connects **one endpoint** to **one or more widget ports**. It de
 | **out** | Widget → Endpoint | Send commands, set values |
 | **bidir** | Both directions | Control + feedback (e.g., slider that shows current position) |
 
-### Creating a Binding Group
+### Advanced Group Editing
 
-1. Open **Bindings** panel (link icon in sidebar)
-2. Click **+ Add Binding Group**
-3. Select the endpoint and direction
-4. Save, then add mappings inside the group
+Use the Binding Group editor when the automatic Connection Studio path is not enough. Select the
+endpoint and direction, configure policy or trigger behavior, then add or edit its Mappings. This is
+an advanced configuration surface, not a prerequisite for connecting one observed field to one port.
 
 ## Binding Mappings
 
-Each mapping connects a specific **widget port** to a **payload path** within the endpoint's data.
+Each Mapping connects a specific **widget port** to a **payload path** within the Endpoint's data.
 
 ### Payload Path
 
-The payload path extracts a specific value from the endpoint's JSON payload using dot-notation:
+The payload path extracts a specific value from the Endpoint's JSON payload using dot notation:
 
 | Payload | Path | Extracted Value |
 |---------|------|-----------------|
@@ -50,7 +70,8 @@ The payload path extracts a specific value from the endpoint's JSON payload usin
 
 ### Multiple Mappings per Group
 
-One binding group can have multiple mappings. This is useful when a single endpoint publishes a JSON object with multiple fields:
+One Binding Group can have multiple Mappings. This is useful when a single Endpoint publishes a JSON
+object with multiple fields:
 
 ```
 Endpoint: sensors/esp32 → {"temperature": 23.5, "humidity": 45.2}
@@ -65,7 +86,8 @@ Binding Group: "ESP32 Readings" (direction: in)
 
 ### history_size — Time-Series Buffer
 
-Set `history_size` in endpoint config to enable server-side ring-buffer storage. This is essential for chart widgets.
+Set `history_size` in Endpoint config to enable server-side ring-buffer storage. This is essential for
+chart widgets.
 
 ```json
 {"history_size": 60}
@@ -74,7 +96,7 @@ Set `history_size` in endpoint config to enable server-side ring-buffer storage.
 **What it does:**
 - Stores the last N payloads in a Redis ring-buffer
 - New clients receive **backfill** on subscribe (chart immediately shows history)
-- Endpoint runs at full speed (ignores demand-aware throttling)
+- Keeps the Endpoint collecting at full speed even with no viewer
 - Ideal for WChart, WSparkline, WBarChart
 
 **Without history_size:** Charts only show data received after the page loads.
@@ -118,17 +140,22 @@ Set `history_size` in endpoint config to enable server-side ring-buffer storage.
 }
 ```
 
-## Demand-Aware Polling
+## Demand-Aware Activity
 
-Flintbay is smart about resource usage. When no one is viewing a dashboard:
+Flintbay reduces connector work when no browser is using an Endpoint, but idle behavior depends on
+the protocol and deployment configuration:
 
-- **MQTT/WebSocket/ROS 2** connectors suspend subscriptions — no messages processed
-- **REST** endpoints stop polling entirely
-- When a user opens the page, connectors resume instantly
+- **REST** continues polling. With no UI subscriber, its configured interval is clamped to the
+  background minimum rather than stopped. The product default minimum is 1000 ms; the public
+  all-in-one image's default `edge` profile uses a 5000 ms floor.
+- **MQTT, WebSocket, and ROS 2** background subscriptions are configuration-dependent. With their
+  background setting `off`, they suspend at zero demand and resume when a browser needs them; with
+  it `on`, they stay subscribed. The `edge` profile uses `off`, while `balanced` uses `on`.
+- An Endpoint with `history_size > 0` stays active at its configured rate in either profile so it can
+  collect time-series backfill.
 
-**Override:** Endpoints with `history_size > 0` always run at full speed (they need to collect data even when no one is watching).
+To keep push subscriptions active at zero demand explicitly:
 
-**Keep subscriptions active at zero demand:**
 ```yaml
 environment:
   FLINTBAY_MQTT_BACKGROUND_ENABLED: "on"   # Keep MQTT subscribed
@@ -136,13 +163,9 @@ environment:
   FLINTBAY_ROS2_BACKGROUND_ENABLED: "on"   # Keep ROS 2 subscribed
 ```
 
-The default `edge` profile uses `off` and suspends these subscriptions until a
-browser needs them. The `balanced` profile uses `on`. Endpoints with
-`history_size > 0` remain active in either profile.
-
 ## Outbound Bindings (Commands)
 
-For `out` and `bidir` bindings, widget events are sent to the endpoint.
+For `out` and `bidir` bindings, widget events are sent to the Endpoint.
 
 ### Trigger Modes
 
@@ -164,7 +187,7 @@ Control **when** a command fires:
 
 ### Payload Building
 
-For outbound bindings with multiple mappings, the system builds a JSON payload from all port values:
+For outbound bindings with multiple Mappings, the system builds a JSON payload from all port values:
 
 ```
 Widget: WJoystick → port "position" = {x: 0.5, y: -0.3}
@@ -177,49 +200,46 @@ Result payload sent to endpoint:
   {"linear": {"x": 0.5}, "angular": {"z": -0.3}}
 ```
 
-## ACK-Confirmed Commands
+## Acknowledged Commands
 
-For critical operations, enable ACK to confirm your hardware actually executed the command.
+Keep two concerns separate: widget interaction controls **when the widget emits a value**, while the
+Binding Group's delivery policy controls **how that command is acknowledged**. Widget submit behavior
+is not a list of Binding ACK modes.
 
-### ACK Modes
+### Binding ACK Modes
 
-| Mode | Widget Behavior |
-|------|-----------------|
-| **fire** | Send and forget — widget resets immediately |
-| **ack** | Widget shows "pending" until device confirms |
-| **submit** | User must confirm before sending |
+| Mode | Confirmation |
+|------|--------------|
+| **Transport** | The connector accepted the command, such as a successful HTTP response or accepted connector write. This does not prove the hardware executed it. |
+| **Execution** | Later incoming telemetry matched the configured device-state criteria. |
 
-### How ACK Works
+### How Execution Confirmation Works
 
 ```
-User clicks button
-    → Widget enters PENDING state (spinner, disabled)
-    → Command sent to endpoint
-    → Device processes command
-    → Device publishes new state
-    → Flintbay matches state to expected value
-    → Widget enters CONFIRMED state (green flash)
-    → Widget returns to IDLE
+User changes a control
+    → Widget emits a value
+    → Binding sends the command
+    → Connector accepts the write
+    → Device publishes new telemetry
+    → Flintbay matches the configured state field and expected value
+    → Command is confirmed
 ```
 
-If the device doesn't confirm within the timeout:
-```
-    → Widget enters FAILED state (red flash)
-    → Widget returns to IDLE (re-enabled)
-```
+Execution confirmation selects a field path in the incoming state and an expected value. The
+expected value may be fixed or reference the value sent from a widget port with `PORT:<port>`.
+Configure timeout and the desired failure, revert, and retry behavior in the Binding policy. If no
+matching telemetry arrives before the timeout, Flintbay reports failure according to that policy.
 
-### ACK Types
-
-- **Transport ACK**: Endpoint accepted the message (HTTP 2xx, MQTT PUBACK)
-- **Execution ACK**: Device state actually matches expected value (state_match)
-
-Configure in widget parameters under `submit_mode` group.
+A transport-level acknowledgement—including MQTT delivery acknowledgement—only says the transport
+or connector accepted the message. It is not evidence that the device carried out the command; use
+Execution confirmation when reported hardware state is the required proof.
 
 ## Transforms on Bindings
 
-Each mapping can have a transform applied. See [Data Transforms](./transforms.md) for the full list.
+Each Mapping can have a transform applied. See [Data Transforms](./transforms.md) for the full list.
 
-Transforms are applied **per-mapping**, so different widgets bound to the same endpoint can show different scales:
+Transforms are applied **per Mapping**, so different widgets connected to the same Endpoint can show
+different scales:
 
 ```
 Endpoint: motor/speed → raw value 0–4095
@@ -230,9 +250,9 @@ Mapping 2: WProgressBar (%) → transform: map_range [0,4095] → [0,100]
 
 ## Tips
 
-- **One endpoint, many widgets**: Use multiple mappings in one binding group
-- **Same widget, multiple endpoints**: Create separate binding groups for each endpoint
-- **Charts need history**: Always set `history_size` on endpoints feeding WChart/WSparkline
-- **Joystick → ROS 2**: Use `throttle` policy to limit message rate, `deadzone` transform to eliminate drift
+- **One endpoint, many widgets**: Use multiple Mappings in one Binding Group
+- **Same widget, multiple endpoints**: Create separate Binding Groups for each Endpoint
+- **Charts need history**: Set `history_size` on Endpoints feeding WChart/WSparkline
+- **Joystick → ROS 2**: Use `throttle` policy to limit message rate and a `deadzone` transform to eliminate drift
 - **Toggle feedback**: Use `bidir` direction so the switch reflects actual device state, not just what you clicked
-- **Debugging**: Use the endpoint's "Last Payload" viewer to see what data is arriving, then set your payload_path accordingly
+- **Debugging**: Expand the Endpoint in **Data** to inspect observed fields before connecting one to a port

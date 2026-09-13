@@ -1,6 +1,7 @@
 # Getting Started with Flintbay
 
-Flintbay — a self-hosted dashboard for robotics and IoT. From zero to live data in 10 minutes.
+Flintbay is a self-hosted browser control station for robotics and connected hardware. This guide
+starts with an empty deployment and ends with a live MQTT value on a Gauge.
 
 ## Prerequisites
 
@@ -61,104 +62,79 @@ Open **http://localhost:19580** — done.
 | Username | `admin` |
 | Password | `admin` |
 
-⚠️ Change the password immediately after first login (Sidebar → **Administration** → **Users** → reset password).
+⚠️ Change the password immediately: open **Users** in the sidebar, select `admin`, and reset its
+password.
 
-## Create a Workspace
+## Create the Dashboard
 
-A workspace is an isolated environment — all screens, sources, and bindings live inside one.
+### Create a Workspace
 
-1. Click **+ New Workspace** in the sidebar
-2. Name it `my-lab`
-3. Click **Create**
+A workspace is an isolated environment — its screens, Sources, widgets, and connections stay separate
+from every other workspace.
 
-You're now inside your workspace.
+1. Open the **Workspace** selector's options menu (`⋮`) and choose **Create**.
+2. Name the workspace `my-lab` and choose **Create**.
 
-## Add a Data Source
+### Create a Screen, Page, and Gauge
 
-We'll connect to the public Mosquitto MQTT broker as an example.
+1. Open the **Screen** selector's options menu (`⋮`), choose **Create**, and name the screen
+   `Monitoring`.
+2. Open the **Page** selector's options menu (`⋮`), choose **Create**, and name the page `Sensors`.
+3. Open the page in **Edit mode**, choose **Add widget**, and add a **Gauge**.
+4. Set its label to `Temperature`, range to `0`–`100`, and unit to `°C`.
+5. Keep this page open. Its Gauge will appear in Connection Studio's **Widgets** pane.
 
-1. Open **Sources** in the sidebar
-2. Click **+ Add Source**
-3. Fill in:
-   - **Name:** `Test Broker`
-   - **Protocol:** MQTT
-   - **Host:** `test.mosquitto.org`
-   - **Port:** `1883`
-4. Click **Save**
+## Connect Your First Live Value
 
-The connection indicator turns green when connected.
+We'll use the public Mosquitto MQTT broker and a unique topic so your reading does not collide with
+another tutorial user. Choose your own short suffix and use the same topic in the MQTT URI and publish
+command; for example, `flintbay/tutorial/alex-a7f3`.
 
-## Create an Endpoint
+### Add the MQTT Address
 
-An endpoint is a single data channel — for MQTT, that's a topic.
+1. Open **Connection Studio**.
+2. In **Data**, paste the complete URI
+   `mqtt://test.mosquitto.org:1883/flintbay/tutorial/alex-a7f3` into **Paste an address, or search**.
+   Pasting starts address intake automatically; Enter submits an address that you typed.
+3. Review the MQTT Source and Endpoint draft, supply any required details, and choose **Add**.
+4. Wait for the new Source and Endpoint to appear in **Data**.
+5. Expand the Endpoint. Because it has no stored payload yet, Connection Studio starts a short preview
+   and waits for its first message.
 
-1. Inside your source, click **+ Add Endpoint**
-2. Configure:
-   - **Name:** `Temperature`
-   - **Direction:** In (subscribe)
-   - **Topic:** `flintbay/demo/temperature`
-3. Click **Save**
+### Publish an Observed Field
 
-## Build the Dashboard
-
-### Add a Screen and Page
-
-1. Go to **Screens** in the sidebar
-2. Click **+ Add Screen**, name it `Monitoring`
-3. Inside the screen, a default page is created. Rename it to `Sensors` if you like.
-
-### Place a Widget
-
-1. Open the page in **Edit mode** (pencil icon)
-2. Click **+ Add Widget**
-3. Choose **WGauge** (under Display category)
-4. Configure:
-   - **Label:** `Temperature`
-   - **Min:** `0`
-   - **Max:** `100`
-   - **Unit:** `°C`
-5. Position and resize as needed
-
-### Create a Binding
-
-Bindings connect widget ports to endpoint data — this is how values flow into your UI.
-
-1. Open the **Bindings** panel (link icon in sidebar)
-2. Click **+ Add Binding Group**
-3. Configure:
-   - **Name:** `Temperature Reading`
-   - **Endpoint:** `Test Broker → Temperature`
-   - **Direction:** In
-4. Click **Save**
-5. Add a **Mapping** inside the group:
-   - **Widget:** your gauge
-   - **Port:** `value`
-   - **Payload Path:** leave empty for raw numeric, or `temp` if your payload is `{"temp": 23.5}`
-
-## Test It
-
-Publish a message from any MQTT client:
+Install an MQTT client if needed (`apt install mosquitto-clients` or
+`brew install mosquitto`), set `TOPIC` to the exact topic in the URI, and publish while the Endpoint is
+expanded:
 
 ```bash
-# Install: apt install mosquitto-clients (or brew install mosquitto)
-mosquitto_pub -h test.mosquitto.org -t "flintbay/demo/temperature" -m "23.5"
+TOPIC='flintbay/tutorial/alex-a7f3'
+mosquitto_pub -h test.mosquitto.org -t "$TOPIC" -m '{"temp": 23.5}'
 ```
 
-Or with JSON payload:
+The first payload is stored as the Endpoint's latest snapshot, and the observed `temp` field appears
+under it. If the preview times out before the message arrives, choose the Endpoint's refresh action and
+publish again. A non-retained MQTT message sent before the preview starts cannot be recovered.
 
-```bash
-mosquitto_pub -h test.mosquitto.org -t "flintbay/demo/temperature" -m '{"temp": 23.5}'
-```
+### Connect the Field to the Gauge
 
-The gauge updates in real time. Exit edit mode to see the live dashboard.
+1. In **Data**, select the observed `temp` field.
+2. In **Widgets**, expand the Gauge and select its `value` port. You may also choose the port first and
+   the field second.
+3. Review the proposed `temp → Gauge.value` connection and choose **Connect**.
+4. Publish the same JSON command again. The Gauge updates to `23.5` in real time.
+
+Exit edit mode to see the live dashboard. Connection Studio creates or reuses the underlying Binding
+Group and Mapping; open their advanced editors only when you need policies, transforms, triggers,
+history, or acknowledgement behavior.
 
 ## How It All Connects
 
 ```
 Workspace
 ├── Screen → Page → Widget (UI)
-├── Source → Endpoint (data connection)
-└── Binding Group → Mapping (widget port ↔ endpoint)
+├── Source → Endpoint → observed field (data)
+└── Binding Group → Mapping (field ↔ widget port)
 ```
 
 ## Next Steps
@@ -167,6 +143,7 @@ Workspace
 - [ROS 2 TurtleBot Control](./examples/ros2-turtlebot.md) — joystick + camera
 - [REST API Polling](./examples/rest-api-polling.md) — chart with live data
 - [Widget Catalog](./widgets.md) — all 42 widget types
+- [Bindings](./bindings.md) — field-to-port connections and advanced delivery behavior
 - [Data Transforms](./transforms.md) — scale, map, filter incoming data
 - [Reverse Proxy Setup](./reverse-proxy.md) — HTTPS with Nginx/Caddy/Traefik
 - [Push Notifications](./push-notifications.md) — alerts when you're away

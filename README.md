@@ -79,6 +79,10 @@ Open **http://localhost:19580** — done.
 
 Data is stored in the `flintbay_data` volume and survives container restarts and image updates.
 
+Next, open **Connection Studio** on a dashboard page: select an observed field in **Data**, select a
+widget port in **Widgets**, then choose **Connect**. The [Getting Started guide](docs/getting-started.md)
+walks from a fresh deployment to the first live value.
+
 > **Two ports, one of them optional.** Everything — UI, API, MCP — is served
 > over `19580`. Live camera video uses WebRTC, and WebRTC media cannot travel
 > over HTTP, so it gets its own port `8189` (UDP, plus TCP for networks that
@@ -425,9 +429,9 @@ Change language in the sidebar → your name (bottom of the sidebar) → **User 
 
 **Start here**
 
-- [Getting Started](docs/getting-started.md) — zero to live data in ten minutes
+- [Getting Started](docs/getting-started.md) — zero to a first live value through Connection Studio
 - [Widget Catalog](docs/widgets.md) — all 42 widget types and their ports
-- [Bindings](docs/bindings.md) — connecting widgets to data: directions, `payload_path`, history, ACK
+- [Bindings](docs/bindings.md) — field-to-port connections, advanced Groups/Mappings, transforms, history, triggers, policies, and ACK behavior
 - [Data Transforms](docs/transforms.md) — the 13 transforms, with recipes
 
 **Worked examples**

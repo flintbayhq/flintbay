@@ -91,9 +91,9 @@ Widgets for visual structure.
 
 | Widget | Description | Key Ports |
 |--------|-------------|-----------|
-| **WPanel** | Container with title bar | `title` (in) |
-| **WDivider** | Horizontal/vertical separator | — |
-| **WShape** | Geometric shapes for diagrams | — |
+| **WPanel** | Frame that groups widgets, with an optional header | `title` (in) |
+| **WDivider** | Line: separator, arrow or connector — pipes, wires, buses | `active` (in) |
+| **WShape** | Closed shapes for diagrams | — |
 | **WHtml** | Custom HTML content | `content` (in), `data` (in) |
 | **WIframe** | Embed external content | `url` (in) |
 
