@@ -20,6 +20,13 @@ Released 2026-09-13.
 - Connecting fields to widgets now gives clearer waiting, error, and retry feedback.
 - Media widgets and controls are more polished and resilient.
 
+```
+ghcr.io/flintbayhq/flintbay:0.1.3
+index  sha256:858436797f1a262757f455528094417d6ed8d474181ae84aaf0bd1a155f8acd4
+amd64  sha256:9bb5527c4abae9ebe324c2d27f00b063f44d45501a71621e60842f5f4ada2c44
+arm64  sha256:b80c919125c071ae69c69756d2910203fd8048c09da54aa81d097ddaaf10b2d2
+```
+
 ## 0.1.2
 
 Released 2026-09-10.
