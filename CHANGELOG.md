@@ -24,6 +24,13 @@ Released 2026-09-14.
   owner, and deactivated accounts stay visible as members.
 - The divider widget draws bends, caps and routing correctly.
 
+```
+ghcr.io/flintbayhq/flintbay:0.1.4
+index  sha256:1820688ca362d51a7b2d30ba3fe77f7911570ed22626c9c168504f7286c1537c
+amd64  sha256:d40e20aa40fa4e21f59130e536cf25dd6ad66046b32d89815690db9b8f168d5f
+arm64  sha256:c6bfab4bc2d216db8cb5a78b695d304c4fc1c6e159b3a66c2c7f4e46bb221f87
+```
+
 ## 0.1.3
 
 Released 2026-09-13.
