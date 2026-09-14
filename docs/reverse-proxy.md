@@ -272,5 +272,5 @@ the proxy passed the upgrade through. A `502` or a hang is a proxy problem.
 | 502 Bad Gateway | Flintbay container not running or wrong service name in proxy config |
 | Mixed content warnings | Ensure all traffic uses the `FLINTBAY_PUBLIC_URL` HTTPS origin |
 | Camera video plays but lags about a second | WebRTC could not connect and LL-HLS took over; publish `8189/udp` and `8189/tcp` and open them upstream |
-| Camera video never starts | Check the Source in Connection Studio; the media port only affects which transport is used, not authorization |
+| Camera video never starts | Not a proxy problem: the media port only chooses the transport. Check the Source in Connection Studio, and if the widget says "Gateway required", check the gateway process — see [Live Video](environment.md#udp-receive-buffer) |
 | CSRF token mismatch | Verify `FLINTBAY_PUBLIC_URL`; override cookie domain/SameSite only when required |

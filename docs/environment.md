@@ -126,6 +126,34 @@ means the media port is not reachable from that client. The fallback also moves
 work onto the API, which authorizes every media segment, so a deployment serving
 many viewers over LL-HLS costs noticeably more than the same viewers over WebRTC.
 
+### UDP receive buffer
+
+The gateway asks the kernel for a 2 MiB UDP read buffer, which reduces packet
+loss when several high-bitrate cameras are pulled at once. Linux caps that
+request at `net.core.rmem_max`, whose default is `212992`. The gateway takes
+whatever the host grants and starts either way, so this needs no attention; on a
+host below the request it logs the ceiling and the command to raise it.
+
+To grant the full buffer, raise the ceiling on the host and recreate the
+container, which is when the value is read:
+
+```bash
+sysctl -w net.core.rmem_max=2097152
+echo 'net.core.rmem_max = 2097152' > /etc/sysctl.d/99-flintbay-media.conf
+```
+
+It is a ceiling, not an allocation, so raising it costs nothing until a socket
+asks. It cannot be set from inside the container: the setting is not
+per-namespace, and Docker's `--sysctl` refuses it for that reason. Leaving it
+alone costs some packet loss under sustained load and nothing else.
+
+If a camera widget reports **Gateway required — not yet available**, the gateway
+process is not answering. Check it directly:
+
+```bash
+docker exec flintbay supervisorctl -c /etc/supervisor/conf.d/flintbay.conf status mediamtx
+```
+
 | Variable | Default | Purpose |
 |---|---|---|
 | `FLINTBAY_MEDIA_WEBRTC_PORT` | `8189` | WebRTC transport port, served as UDP and as ICE-TCP on the same number for networks that block UDP. |
