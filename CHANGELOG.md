@@ -11,6 +11,19 @@ about the deployment is sent anywhere.
 Headings are the bare version, so the anchor for a version is its number without the dots:
 `#012` for 0.1.2.
 
+## 0.1.4
+
+Released 2026-09-14.
+
+- Live camera video now starts on hosts whose UDP receive buffer limit is at the system default. The
+  media gateway asked for more than the kernel would grant and refused to run at all, which left
+  every camera reporting that a gateway was required.
+- API keys are refused on routes no scope can bound, and destructive permissions require a key issued
+  for them.
+- Workspace membership is stricter: nobody can change their own role or leave a workspace without an
+  owner, and deactivated accounts stay visible as members.
+- The divider widget draws bends, caps and routing correctly.
+
 ## 0.1.3
 
 Released 2026-09-13.
