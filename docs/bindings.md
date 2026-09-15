@@ -203,8 +203,8 @@ Result payload sent to endpoint:
 ## Acknowledged Commands
 
 Keep two concerns separate: widget interaction controls **when the widget emits a value**, while the
-Binding Group's delivery policy controls **how that command is acknowledged**. Widget submit behavior
-is not a list of Binding ACK modes.
+Binding Group's delivery policy controls **how that command is acknowledged**. Widget submit behavior,
+described in [Submit Modes](./widgets.md#submit-modes), is not a list of Binding ACK modes.
 
 ### Binding ACK Modes
 

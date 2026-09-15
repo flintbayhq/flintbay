@@ -107,17 +107,23 @@ Every widget has these system ports (hidden by default):
 | `disabled` | in | Disable widget interaction remotely |
 | `pending` | in | Show loading state while command is in-flight |
 
-## ACK Modes
+## Submit Modes
 
-Control widgets support acknowledgment modes for reliable command delivery:
+A control widget's submit mode governs **when it emits a value and how it behaves afterwards**. It
+belongs to the interaction, not to delivery: whether a command is confirmed, and on what evidence, is
+decided by the Binding Group's ACK policy. The two are separate concerns — see
+[Acknowledged Commands](./bindings.md#acknowledged-commands).
 
 | Mode | Behavior |
 |------|----------|
-| **fire** | Send and forget — widget resets immediately |
-| **ack** | Wait for device acknowledgment before resetting |
-| **submit** | Require explicit user confirmation before sending |
+| **fire** | Emit and reset immediately, without waiting for an outcome |
+| **ack** | Emit, then wait for the Binding's acknowledgement before resetting |
+| **submit** | Require explicit user confirmation before emitting |
 
-Configure ACK mode in widget parameters under the `submit_mode` group.
+Configure this in widget parameters under the `submit_mode` group.
+
+In `ack` mode what counts as the acknowledgement is defined by the Binding Group's policy — transport
+acceptance, or matched device state — not by the widget.
 
 ## Example Data
 
