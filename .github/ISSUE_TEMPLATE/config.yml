@@ -1,8 +1,5 @@
 blank_issues_enabled: false
 contact_links:
-  - name: 🔒 Security vulnerability
-    url: https://github.com/flintbayhq/flintbay/blob/main/SECURITY.md
-    about: Never report a vulnerability in a public issue. Email security@flintbay.io — acknowledgement within 72 hours.
   - name: 💬 Question or help getting something working
     url: https://discord.gg/ptCvyXAAnV
     about: Ask on Discord. Faster than an issue for configuration, wiring a device, or "is this possible?".
