@@ -208,6 +208,10 @@ described in [Submit Modes](./widgets.md#submit-modes), is not a list of Binding
 
 ### Binding ACK Modes
 
+Acknowledgement is off by default — the command is dispatched and nothing waits for confirmation,
+which is what fire-and-forget means. Switch it on in the Binding Group's policy and choose what
+counts as proof:
+
 | Mode | Confirmation |
 |------|--------------|
 | **Transport** | The connector accepted the command, such as a successful HTTP response or accepted connector write. This does not prove the hardware executed it. |
