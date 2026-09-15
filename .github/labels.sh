@@ -16,7 +16,10 @@
 #   DRY_RUN=1 ./.github/labels.sh            # print what would run, change nothing
 #
 # Note: this only adds and updates. Labels that exist in the repository but are absent
-# here are left alone — delete those by hand if you want them gone.
+# here are left alone — delete those by hand if you want them gone. Where one of
+# GitHub's stock labels already fits (bug, enhancement, documentation, duplicate,
+# wontfix, good first issue, help wanted) this reuses it and rewrites the description
+# rather than adding a near-duplicate beside it.
 
 set -euo pipefail
 
@@ -60,14 +63,14 @@ echo
 # --- Type: what kind of report this is -------------------------------------------
 label "bug"                 "d73a4a" "Behaves differently than documented"
 label "enhancement"         "a2eeef" "New capability or improvement to an existing one"
-label "docs"                "0075ca" "Documentation error, gap, or clarification"
+label "documentation"       "0075ca" "Documentation error, gap, or clarification"
 label "regression"          "b60205" "Worked in an earlier version, broken in a later one"
 
 # --- Status: where the issue stands ----------------------------------------------
 label "needs-triage"        "fbca04" "Not yet looked at"
-label "needs-info"          "d876e3" "Waiting on the reporter; closed if it goes quiet"
+label "needs-info"          "f9d0c4" "Waiting on the reporter; closed if it goes quiet"
 label "confirmed"           "0e8a16" "Reproduced — the problem is real and understood"
-label "in-progress"         "1d76db" "Being worked on now"
+label "in-progress"         "bfe5bf" "Being worked on now"
 label "fixed-pending-release" "5319e7" "Fixed in the build; ships in the next published version"
 label "wontfix"             "ffffff" "Deliberately not being changed"
 label "duplicate"           "cfd3d7" "Already tracked in another issue"
