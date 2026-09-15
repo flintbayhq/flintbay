@@ -2,7 +2,7 @@
 
 Put Flintbay on a Jetson, Raspberry Pi, laptop, or local server. Add live video, a joystick, buttons, setpoints, and telemetry; connect them to ROS 2, MQTT, REST, or WebSocket; then open a browser and control the machine. No separate frontend project required.
 
-**Build the machine, not the control app.** Free to self-host, distributed under the MIT license, and deployed with one Docker command.
+**Build the machine, not the control app.** Free to self-host, no subscription, and deployed with one Docker command.
 
 🌐 [Live Demo](https://demo.flintbay.io) · 🏠 [Website](https://flintbay.io) · 💬 [Discord](https://discord.gg/ptCvyXAAnV) · 📝 [Issues](https://github.com/flintbayhq/flintbay/issues)
 
@@ -459,10 +459,20 @@ Change language in the sidebar → your name (bottom of the sidebar) → **User 
 
 - [Realtime Performance](docs/realtime-performance.md) — measured load, saturation, fan-out and soak results
 - [Security Policy](SECURITY.md) — supported versions, image signature verification, reporting a vulnerability
+- [Contributing](CONTRIBUTING.md) — where to take a bug, a feature request, a question, or a docs fix
 
 ## License
 
-MIT — free for personal and commercial use.
+Free to use, personally and commercially. No subscription, no license key, no seat count, no
+feature held back for a paid tier, and no telemetry. Run it on one machine or on fifty.
 
-> Flintbay is actively developed by a solo developer. Feedback and ideas are welcome — open an issue or start a discussion.
+Flintbay is distributed as a ready-to-run container image. The documentation and deployment files
+in this repository are [MIT licensed](LICENSE); the application ships as the image rather than as
+source.
+
+> Flintbay is actively developed by a solo developer, and given away because a control station
+> should not be the expensive part of building a machine. Feedback and ideas are welcome —
+> [open an issue](https://github.com/flintbayhq/flintbay/issues/new/choose) for a bug or a feature
+> request, or ask on [Discord](https://discord.gg/ptCvyXAAnV). What makes a report actionable is in
+> [CONTRIBUTING.md](CONTRIBUTING.md).
 > For custom widget development — [let's talk](https://flintbay.io/).

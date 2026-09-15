@@ -1,0 +1,96 @@
+name: Feature request
+description: Suggest a capability, widget, connector, or improvement
+title: "[Feature]: "
+labels: ["enhancement", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Ideas are welcome. Flintbay exists to save people from writing another throwaway control
+        app, so a request that comes from a real machine you are building is the most useful kind.
+
+        The one thing worth writing carefully is the **problem**, not the solution. Knowing what
+        you are trying to control, and what currently blocks you, often reveals that an existing
+        widget, transform, or binding policy already covers it — or that the right fix is
+        somewhere other than where the request points.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What are you trying to do
+      description: |
+        The machine, device, or workflow involved, and what stops you today. Concrete beats
+        general: "a rover with a PTZ camera, and there is no widget to drive pan/tilt" is easier
+        to act on than "more camera controls".
+      placeholder: |
+        I am building a greenhouse controller. Irrigation valves are on MQTT, and I need an
+        operator to see a valve's confirmed state before opening the next one. Today the button
+        goes green as soon as the command is published, so the operator cannot tell whether the
+        valve actually moved.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What would solve it
+      description: |
+        Your idea of the fix, if you have one. A rough sketch is fine. If you do not have one,
+        leave this empty — the section above is what matters.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      description: Where this would live, as best you can tell.
+      multiple: true
+      options:
+        - New widget
+        - Existing widget — more ports, options, or behaviour
+        - Connector — MQTT
+        - Connector — ROS 2
+        - Connector — REST
+        - Connector — WebSocket
+        - New connector or protocol
+        - Live video
+        - Bindings — transforms, triggers, ACK, policies
+        - Dashboard editing and layout
+        - Auth, roles, sharing
+        - MCP / AI integration
+        - Deployment, configuration, operations
+        - Documentation
+        - Other / not sure
+    validations:
+      required: true
+
+  - type: textarea
+    id: workaround
+    attributes:
+      label: What you are doing instead
+      description: |
+        The current workaround, if any — an external script, a REST shim, a transform chain, a
+        second dashboard. This shows how much the gap actually costs, and sometimes it is
+        already the better design.
+    validations:
+      required: false
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: Anything else
+      description: |
+        Links to a protocol spec, a device datasheet, a message definition, or a picture of the
+        panel you have in mind. For a ROS 2 request, the message type is especially useful.
+    validations:
+      required: false
+
+  - type: markdown
+    attributes:
+      value: |
+        ---
+
+        Flintbay is built by one developer, so requests are weighed against each other rather
+        than queued. Something that unblocks a real deployment tends to move first. No promise
+        of a date, but you will get an honest answer about whether it is planned.

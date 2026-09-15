@@ -1,0 +1,156 @@
+name: Bug report
+description: Something in Flintbay behaves differently than documented
+title: "[Bug]: "
+labels: ["bug", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report this.
+
+        **Not a bug report?**
+        - A security vulnerability → do **not** file it here. Follow [SECURITY.md](https://github.com/flintbayhq/flintbay/blob/main/SECURITY.md).
+        - A question about how to do something → ask on [Discord](https://discord.gg/ptCvyXAAnV), it is faster.
+        - A missing capability → use the *Feature request* form instead.
+
+        Flintbay runs against real hardware, so the same symptom can come from the deployment,
+        the network, or the device. The fields below are what make a report actionable without
+        a round trip.
+
+  - type: checkboxes
+    id: preflight
+    attributes:
+      label: Before you file
+      options:
+        - label: This is not an undisclosed security vulnerability (those go to security@flintbay.io).
+          required: true
+        - label: I searched the existing issues and did not find this already reported.
+          required: true
+        - label: I reproduced this on the newest published stable version, or I state below why I cannot.
+          required: false
+
+  - type: textarea
+    id: release
+    attributes:
+      label: Version
+      description: |
+        The container reports its own identity. Run this against your deployment and paste the output:
+
+        ```
+        docker exec flintbay cat /app/release.json
+        ```
+
+        If the container will not start, give the image reference you pulled instead
+        (for example `ghcr.io/flintbayhq/flintbay:0.1.4`) and say so.
+      render: json
+    validations:
+      required: true
+
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Host
+      description: Where the container runs. Pick the closest match.
+      options:
+        - amd64 — desktop or laptop
+        - amd64 — server or cloud VM
+        - arm64 — Jetson Orin
+        - arm64 — Jetson Nano
+        - arm64 — Raspberry Pi 5
+        - arm64 — Raspberry Pi 4
+        - arm64 — other
+        - Other / not sure
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      description: Which part of Flintbay does this concern? Select every part that applies.
+      multiple: true
+      options:
+        - Connector — MQTT
+        - Connector — ROS 2
+        - Connector — REST
+        - Connector — WebSocket
+        - Live video — WebRTC / LL-HLS / RTSP
+        - Widgets and bindings — Connection Studio, transforms, ACK
+        - Dashboard editing — screens, pages, layout
+        - Auth, sessions, workspace RBAC
+        - MCP / AI integration
+        - Deployment — image, startup, environment, reverse proxy
+        - Backup, restore, upgrade
+        - Metrics or logging
+        - Documentation
+        - Other / not sure
+    validations:
+      required: true
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: The observed behaviour, and what you expected instead.
+      placeholder: |
+        Observed: the gauge stays at "—" and the source shows "connected".
+        Expected: the gauge shows the value published on the topic.
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      description: |
+        Number the steps from a state someone else can reach. If a specific widget, source
+        type, endpoint payload, or transform is involved, name it — the fault is often in the
+        combination rather than in one part.
+      placeholder: |
+        1. Deploy the Compose file from the README, unchanged.
+        2. Add an MQTT source pointing at mosquitto on the LAN.
+        3. Expand a readable endpoint on topic `sensors/temp`, payload `{"c": 21.5}`.
+        4. Bind the observed field `c` to a Gauge's `value` port.
+        5. Publish to the topic.
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Deployment details
+      description: |
+        What differs from the README's Compose file — any `FLINTBAY_*` overrides, a reverse
+        proxy, external PostgreSQL or Redis, an unusual network topology.
+
+        **Remove credentials, tokens, private hostnames, and any customer data before pasting.**
+      placeholder: |
+        Behind Caddy with a real HTTPS origin. FLINTBAY_PUBLIC_URL set accordingly.
+        FLINTBAY_RESOURCE_PROFILE=balanced. Everything else default.
+      render: yaml
+    validations:
+      required: false
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: |
+        Relevant container output, for example `docker logs flintbay --tail 200`. Browser
+        console errors help for anything visible in the interface.
+
+        **Same rule: strip secrets and private data.** Raising `FLINTBAY_LOG_LEVEL` to `INFO`
+        or `DEBUG` before reproducing usually makes the cause visible.
+      render: shell
+    validations:
+      required: false
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: Anything else
+      description: |
+        Screenshots or a short screen recording, especially for a rendering or interaction
+        problem. Whether it worked on an earlier version, and which one.
+    validations:
+      required: false
