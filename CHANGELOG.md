@@ -32,6 +32,13 @@ Released 2026-09-18.
   longer point north for a heading they do not have.
 - Existing D-Pads keep their layout and repeat interval across the upgrade.
 
+```
+ghcr.io/flintbayhq/flintbay:0.1.5
+index  sha256:7f0d53d09c3e7925c40ca8a879de494b562df1dc7f39766f2e88c6622c636645
+amd64  sha256:0167b4cb2134fe42e23dffa0813dff7c2057c88433ee7a83464e8e3993e5b45f
+arm64  sha256:5eb445c2a22f864706487036dc2709a352239950557b8b4aa9dec1da996cb6dc
+```
+
 ## 0.1.4
 
 Released 2026-09-14.
