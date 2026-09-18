@@ -11,6 +11,27 @@ about the deployment is sent anywhere.
 Headings are the bare version, so the anchor for a version is its number without the dots:
 `#012` for 0.1.2.
 
+## 0.1.5
+
+Released 2026-09-18.
+
+- Widgets dragged or resized on a phone now stay where they were put. The move was saved too late
+  to survive a reload, a gesture the browser took over left the widget adrift on screen, and a
+  second move could be overtaken by the answer to the first.
+- Live video and audio, and the map, image and stream widgets, recover on their own after a
+  connection drops or the network returns, instead of staying dark until the page is reloaded.
+- A dashboard opened just after a reconnect shows its real values. Bindings are read again when the
+  socket reopens, and the previous workspace's bindings no longer flash sample values over a
+  configured page.
+- Connection Studio is steadier: a long session no longer accumulates acknowledgement history, a
+  commit that will keep being refused now says why instead of reporting progress for a whole lease
+  window, and replacing a connection reports which Endpoint it leaves unreferenced.
+- The widget editor only offers settings that apply to the style in use, so a choice that cannot
+  take effect is no longer presented. With it: the joystick honours its repeat interval, arrow keys
+  move whichever D-Pad has focus, an E-Stop with its own arm asks once, and the compass and map no
+  longer point north for a heading they do not have.
+- Existing D-Pads keep their layout and repeat interval across the upgrade.
+
 ## 0.1.4
 
 Released 2026-09-14.
