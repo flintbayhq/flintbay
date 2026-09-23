@@ -11,6 +11,30 @@ about the deployment is sent anywhere.
 Headings are the bare version, so the anchor for a version is its number without the dots:
 `#012` for 0.1.2.
 
+## 0.1.6
+
+Released 2026-09-23.
+
+- Turning a binding mapping off now actually stops it. The row was saved as disabled and the API
+  reported success, but the widget kept receiving values until the deployment was restarted — two
+  mappings feeding one port kept interleaving into a sawtooth. A group whose mappings are all
+  disabled also no longer holds a subscription open for data nobody reads.
+- Changing one widget setting over the API or from an MCP client no longer resets the others. A
+  patch is merged into the stored settings, so sending a timeline's item limit keeps its horizontal
+  orientation instead of silently turning it into a vertical list. The web editor was never
+  affected, because it always sent every setting at once.
+- A source that only subscribes while a page is open reports itself connected once data is
+  flowing, instead of showing "connecting" for as long as the page stayed open.
+- Bar charts draw their category labels: long names are shortened to fit, under the bars when they
+  are vertical and beside them when they are horizontal. The labels port could be connected and
+  delivering with nothing appearing.
+- Connection Studio findings can be told apart. Each one carries its full message, and findings of
+  the same kind are distinguished by a short identifier when the server sends no name.
+- Ports and other numeric identifiers no longer show a thousands separator, so an MQTT port reads
+  1883 rather than 1,883.
+- The battery widget's terminal is sized from the battery's thickness, so a wide one no longer
+  grows a nub wider than the battery is tall.
+
 ## 0.1.5
 
 Released 2026-09-18.
