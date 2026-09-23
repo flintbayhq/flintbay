@@ -39,6 +39,13 @@ Released 2026-09-23.
 - The battery widget's terminal is sized from the battery's thickness, so a wide one no longer
   grows a nub wider than the battery is tall.
 
+```
+ghcr.io/flintbayhq/flintbay:0.1.6
+index  sha256:ddf9103da8f865ab3883c1575ec5f3682e09925e88d11dcc42f48fed6b28013d
+amd64  sha256:4dc62c5c976132a6e99e39faf0038bb00b2c2fa616321a5a4280b1e11002d06a
+arm64  sha256:722b63d746af2e1a8daa1a92d445b24031eda4878a1bcc08a3c57f602ee73a23
+```
+
 ## 0.1.5
 
 Released 2026-09-18.
