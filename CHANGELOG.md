@@ -15,6 +15,10 @@ Headings are the bare version, so the anchor for a version is its number without
 
 Released 2026-09-23.
 
+- Security: the image carries a patched `anyio`. The previous version encoded TLS host names with
+  IDNA 2003 ([CVE-2026-63374](https://avd.aquasec.com/nvd/cve-2026-63374)), which can be made to
+  accept a certificate issued for a different name — reachable wherever a deployment talks to a
+  source over TLS. Nothing needs to be reconfigured; upgrading the image is the fix.
 - Turning a binding mapping off now actually stops it. The row was saved as disabled and the API
   reported success, but the widget kept receiving values until the deployment was restarted — two
   mappings feeding one port kept interleaving into a sawtooth. A group whose mappings are all
