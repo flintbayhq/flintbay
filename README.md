@@ -464,11 +464,24 @@ Change language in the sidebar → your name (bottom of the sidebar) → **User 
 ## License
 
 Free to use, personally and commercially. No subscription, no license key, no seat count, no
-feature held back for a paid tier, and no telemetry. Run it on one machine or on fifty.
+feature held back for a paid tier, and no telemetry. Run it on one machine or on fifty. The full
+terms are in [EULA.txt](EULA.txt), and a copy ships inside every image at `/app/EULA.txt` — the copy
+inside an image governs that image.
 
-Flintbay is distributed as a ready-to-run container image. The documentation and deployment files
-in this repository are [MIT licensed](LICENSE); the application ships as the image rather than as
-source.
+Flintbay is distributed as a ready-to-run container image. The application is compiled to native
+code and is not distributed in source form; the source is proprietary. The documentation and
+deployment files in this repository are [MIT licensed](LICENSE), and that MIT grant covers those
+files only.
+
+Third-party components keep their own licenses. Attributions are generated when each image is built,
+from the components actually installed in it, and ship at `/app/THIRD_PARTY_NOTICES.txt`:
+
+```bash
+docker run --rm --entrypoint cat ghcr.io/flintbayhq/flintbay:latest /app/THIRD_PARTY_NOTICES.txt
+```
+
+Shipping Flintbay with hardware, embedding it in a commercial offering, or needing a support
+commitment, warranty, indemnity or a source license — [let's talk](https://flintbay.io/).
 
 > Flintbay is actively developed by a solo developer, and given away because a control station
 > should not be the expensive part of building a machine. Feedback and ideas are welcome —

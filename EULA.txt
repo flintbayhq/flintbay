@@ -1,0 +1,115 @@
+FLINTBAY END-USER LICENCE AGREEMENT
+
+Copyright (c) 2024-2026 Andrii Vasyliev. All rights reserved.
+
+This agreement governs the Flintbay container image published at
+ghcr.io/flintbayhq/flintbay ("the Software"). By running the Software you accept
+these terms. If you do not accept them, do not run it.
+
+
+1. WHAT YOU MAY DO
+
+You may download, run, self-host and use the Software for any purpose,
+including commercial purposes, on as many machines as you like, for as long as
+you like, at no charge. There is no subscription, no licence key, no seat
+count, no feature withheld for a paid tier, and no telemetry.
+
+You may redistribute the Software unmodified, retaining this agreement and the
+accompanying third-party notices, provided you charge no fee for the Software
+itself and do not present it as your own product. Bundling it with hardware or
+with a paid service requires a separate written agreement; see section 6.
+
+You may configure, deploy, orchestrate, network, proxy, back up and operate the
+Software however you need. Operating it is what it is for.
+
+
+2. WHAT YOU MAY NOT DO
+
+You may not decompile, disassemble, deobfuscate or reverse engineer the
+Software, or attempt to recover its source code, except to the minimum extent
+that applicable law expressly permits and cannot lawfully be waived.
+
+You may not remove, alter or obscure copyright notices, this agreement, the
+third-party notices, the build provenance in /app/release.json, or the
+protection metadata in /app/protection.json.
+
+You may not sublicense, rent, lease or sell the Software, or distribute
+modified versions of it.
+
+No rights are granted to the Flintbay source code. The source is proprietary
+and is not part of what the Software distributes.
+
+
+3. TRADE MARKS
+
+"Flintbay" and the Flintbay name and logo are not licensed by this agreement.
+You may state factually that your system runs Flintbay. You may not use the
+name to imply endorsement, certification or affiliation.
+
+
+4. THIS IS NOT A SAFETY SYSTEM
+
+Flintbay is an application-level control interface. It is not a
+functional-safety system and is not safety-rated. Safety interlocks,
+watchdogs, emergency stops and any protection against injury or equipment
+damage must be implemented independently, in the machine or in a lower-level
+controller, and must remain effective when Flintbay is unavailable,
+unresponsive or behaving incorrectly.
+
+You are responsible for verifying commands before execution, for maintaining
+safe operating conditions, and for ensuring that the commands you configure are
+appropriate for the connected equipment and its environment. As the system
+owner you are responsible for securing access, configuring policy, and for
+compliance with the laws, standards and internal procedures that apply to your
+deployment.
+
+
+5. NO WARRANTY AND LIMITATION OF LIABILITY
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT. THERE IS NO
+WARRANTY THAT THE SOFTWARE WILL BE UNINTERRUPTED, TIMELY, SECURE OR
+ERROR-FREE.
+
+TO THE MAXIMUM EXTENT PERMITTED BY LAW, THE COPYRIGHT HOLDER AND CONTRIBUTORS
+SHALL NOT BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+CONSEQUENTIAL, EXEMPLARY OR PUNITIVE DAMAGES, INCLUDING BUT NOT LIMITED TO
+LOSS OF PROFITS, LOSS OF DATA, DOWNTIME, BUSINESS INTERRUPTION, EQUIPMENT
+DAMAGE, PROPERTY DAMAGE, PERSONAL INJURY OR DEATH, ARISING OUT OF OR RELATED
+TO THE USE OF OR INABILITY TO USE THE SOFTWARE, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGES.
+
+The Software is supplied at no charge. Nothing in this agreement creates an
+obligation to provide support, updates, security fixes or continued
+availability of any distribution channel.
+
+
+6. COMMERCIAL AND OEM ARRANGEMENTS
+
+Shipping Flintbay as part of a hardware product, embedding it in a commercial
+offering, redistributing it modified, obtaining warranty or indemnity cover, a
+support commitment, a service-level agreement, or a licence to the source code,
+all require a separate written agreement. Enquiries: https://flintbay.io/
+
+
+7. THIRD-PARTY COMPONENTS
+
+The Software incorporates third-party components licensed under their own
+terms, which take precedence over this agreement for those components. Their
+attributions and licence texts are in /app/THIRD_PARTY_NOTICES.txt inside the
+image, generated at build time from the components actually installed.
+
+
+8. TERMINATION
+
+Rights under this agreement end automatically if you breach it. On termination
+you must stop using and distributing the Software. Sections 2, 3, 4, 5 and 7
+survive termination.
+
+
+9. GENERAL
+
+If any provision is held unenforceable, the remainder stays in effect. Failure
+to enforce a provision is not a waiver of it. This agreement may be updated for
+future versions; the version shipped inside an image governs that image.

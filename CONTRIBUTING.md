@@ -117,11 +117,13 @@ Typos, broken links, and unclear wording need no verification. Send those freely
 
 The contents of this repository — the documentation, the Compose file, these templates — are MIT
 licensed, as stated in [LICENSE](LICENSE). By opening a pull request you agree that your
-contribution is offered under the same terms.
+contribution is offered under the same terms. That MIT grant covers these files only.
 
 The Flintbay image is free to download, self-host, and use commercially, with no subscription or
-license key. It is distributed as a built image rather than as source, so building or forking the
-application is not part of what it offers — using it, on as many machines as you like, is.
+license key, under the terms in [EULA.txt](EULA.txt). It is distributed as a built image rather than
+as source — the application is compiled to native code and the source is proprietary — so building
+or forking the application is not part of what it offers. Using it, on as many machines as you like,
+is.
 
 ## Code of conduct
 
