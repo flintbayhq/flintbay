@@ -14,6 +14,10 @@ Protects against brute-force login attempts.
 
 After 5 failed login attempts, the account is locked for 15 minutes. The lockout is per-account, not per-IP.
 
+Because it counts per account, anyone who can reach the login page and knows a username can keep
+that account locked, including the administrator's. Do not expose the login page to networks you
+do not trust, or put a proxy in front of it that limits login attempts per client address.
+
 > **Tip:** If you lock yourself out, wait 15 minutes. A deployment administrator can
 > reset another account's password from **Sidebar → Administration → Users**.
 
@@ -50,6 +54,17 @@ To rotate the JWT signing key without invalidating all active sessions:
 
 During the transition window, Flintbay accepts tokens signed with either key.
 
+Two more things are keyed by the JWT secret, and in 0.1.6 the previous key does not cover them:
+
+- **API keys** stop working as soon as the secret changes; see
+  [API Keys](api-keys.md#rotating-the-jwt-secret-invalidates-keys).
+- **Refresh tokens** are hashed with it unless `FLINTBAY_SESSION_REFRESH_TOKEN_SECRET` is set. After a
+  rotation, every browser is signed out when its access token next expires.
+
+To make future JWT rotations leave sessions alone, set `FLINTBAY_SESSION_REFRESH_TOKEN_SECRET` to its
+own random value. Setting it for the first time also signs everyone out once. From the next
+release, the previous JWT secret also covers refresh tokens and API keys, as long as it stays set.
+
 ## Session Management
 
 | Setting | Default | Description |
@@ -64,6 +79,14 @@ During the transition window, Flintbay accepts tokens signed with either key.
 - Access token expires after 30 minutes → client uses refresh token to get a new one
 - Refresh token expires after 30 days → user must log in again
 - Max 5 concurrent sessions per user — the 6th login revokes the oldest session
+- Every refresh replaces the refresh token. Presenting a replaced token again is treated as theft,
+  and every session of that account is revoked.
+
+> **In 0.1.6** two refreshes that present the same token at the same moment both succeed, and the
+> theft check does not see it. The next release lets only one of them replace the token. A copy of
+> the old token that arrives within 10 seconds of the replacement is treated as a second tab of the
+> same browser and gets an access token. After that it counts as theft
+> (`FLINTBAY_SESSION_REFRESH_REUSE_GRACE_SECONDS`, 0 disables the grace).
 
 ### Cookie Settings
 
@@ -79,12 +102,14 @@ During the transition window, Flintbay accepts tokens signed with either key.
 
 ## Audit Logging
 
-All security events are logged to the audit log:
+Sign-in events are logged to the audit log:
 - Login attempts (success and failure)
 - Logout
 - Authentication failures
-- Rate limit hits
-- API key usage
+
+Events that name no account are written to the platform (system) log instead: rate-limit hits,
+rejected API keys and expired tokens. Using a valid API key is not audited per request. The key
+records `last_used_at` and `last_used_ip` instead.
 
 There are two views of the trail, on the two authorization axes:
 
@@ -150,7 +175,7 @@ environment:
 | Default in use | Startup logs a warning, the boot `lifecycle` entry flags it, and the Users dialog shows a banner — reported only to the administrator's own session, never to other accounts |
 | Count | One account. The authority is deployment-wide, so a second holder adds capability to nobody and one more secret to keep |
 | Matching | Case-insensitive against `user.username`; empty means nobody administers the deployment |
-| Self-healing | Created if absent and reactivated if disabled on every start, so deleting or deactivating it lasts only until the next restart |
+| Self-healing | Created if absent and reactivated if disabled on every start, so deleting or deactivating it lasts only until the next restart. Setting `FLINTBAY_SUPERADMIN_PASSWORD` to an empty value turns this off. The named account keeps its authority, but its credential is left to you |
 | Password | Applied only when the environment value changes. A password set in the interface survives restarts; an upgrade adopts an existing account without resetting it |
 | Recovery | Change `FLINTBAY_SUPERADMIN_PASSWORD` and restart. No shell access and no command-line tool are involved |
 | Granting | Only by changing the environment. There is no route, so the authority cannot be escalated from inside the product |

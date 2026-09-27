@@ -187,18 +187,32 @@ Control **when** a command fires:
 
 ### Payload Building
 
-For outbound bindings with multiple Mappings, the system builds a JSON payload from all port values:
+On an outbound binding, the payload path says where a port's value is **written**, and the payload
+is built from every Mapping in the group:
 
 ```
-Widget: WJoystick → port "position" = {x: 0.5, y: -0.3}
-
-Binding Mapping:
-  port: position.x → payload_path: linear.x
-  port: position.y → payload_path: angular.z
+Binding Group: "Pump" (direction: out)
+├── Mapping 1: WSlider       → port: value → path: pump.speed
+└── Mapping 2: WToggleSwitch → port: value → path: pump.enabled
 
 Result payload sent to endpoint:
-  {"linear": {"x": 0.5}, "angular": {"z": -0.3}}
+  {"pump": {"speed": 40, "enabled": true}}
 ```
+
+An **empty** path on an outbound Mapping writes the value under the port's own name, so a slider
+with no path sends `{"value": 40}`. That is the opposite of inbound, where empty means "the whole
+payload".
+
+There is one exception: a port whose value is already a complete message is sent as the payload
+itself when its path is empty or is the port's own name. WJoystick's `twist` port works this way,
+so a `geometry_msgs/Twist` reaches `cmd_vel` unwrapped, and the key Connection Studio proposes
+(`twist`) is the right one. Any other path nests it as usual. Paths from other Mappings in the same
+group are added into the message. The `twist` port arrives in the release after 0.1.6; see the
+[TurtleBot example](examples/ros2-turtlebot.md).
+
+A port path can only be the port name as a whole, so one Mapping cannot send `position.x` and
+another `position.y`. Per-port transforms run on the port's whole value, and no transform can
+rescale an object's fields.
 
 ## Acknowledged Commands
 
@@ -257,6 +271,6 @@ Mapping 2: WProgressBar (%) → transform: map_range [0,4095] → [0,100]
 - **One endpoint, many widgets**: Use multiple Mappings in one Binding Group
 - **Same widget, multiple endpoints**: Create separate Binding Groups for each Endpoint
 - **Charts need history**: Set `history_size` on Endpoints feeding WChart/WSparkline
-- **Joystick → ROS 2**: Use `throttle` policy to limit message rate and a `deadzone` transform to eliminate drift
+- **Joystick → ROS 2**: Use `throttle` policy to limit message rate, and the joystick's own **dead zone** setting to eliminate drift
 - **Toggle feedback**: Use `bidir` direction so the switch reflects actual device state, not just what you clicked
 - **Debugging**: Expand the Endpoint in **Data** to inspect observed fields before connecting one to a port

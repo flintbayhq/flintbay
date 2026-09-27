@@ -160,10 +160,10 @@ Pin an explicit version in production:
 ```yaml
 services:
   flintbay:
-    image: ghcr.io/flintbayhq/flintbay:0.2.0
+    image: ghcr.io/flintbayhq/flintbay:0.1.6
 ```
 
-Version tags are immutable: `0.2.0` is never rebuilt or overwritten. For a
+Version tags are immutable: `0.1.6` is never rebuilt or overwritten. For a
 guarantee that survives even a registry mistake, pin the index digest instead:
 
 ```yaml
@@ -171,7 +171,7 @@ guarantee that survives even a registry mistake, pin the index digest instead:
 ```
 
 Resolve the digest for a tag with `docker buildx imagetools inspect
-ghcr.io/flintbayhq/flintbay:0.2.0`. When you pin, update the pin deliberately
+ghcr.io/flintbayhq/flintbay:0.1.6`. When you pin, update the pin deliberately
 whenever a security release is published.
 
 ### Verifying the image
@@ -182,7 +182,7 @@ Each published version is signed with cosign through GitHub OIDC:
 cosign verify \
   --certificate-oidc-issuer https://token.actions.githubusercontent.com \
   --certificate-identity-regexp '^https://github\.com/flintbayhq/flintbay-core/\.github/workflows/build\.yml@' \
-  ghcr.io/flintbayhq/flintbay:0.2.0
+  ghcr.io/flintbayhq/flintbay:0.1.6
 ```
 
 After upgrading, confirm the container is running what you intended:
@@ -203,7 +203,7 @@ that flattened the index — check for a mirror or a proxy in front of the
 registry, and confirm the platform with:
 
 ```bash
-docker buildx imagetools inspect ghcr.io/flintbayhq/flintbay:0.2.0
+docker buildx imagetools inspect ghcr.io/flintbayhq/flintbay:0.1.6
 ```
 
 ## Troubleshooting Upgrades

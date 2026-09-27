@@ -133,7 +133,7 @@ Round to 1 decimal place:
 {
   "kind": "round",
   "version": 1,
-  "params": {"decimals": 1}
+  "params": {"mode": "decimal", "decimals": 1}
 }
 ```
 
@@ -145,7 +145,7 @@ Chain multiple transforms:
   "params": {
     "transforms": [
       {"kind": "map_range", "version": 1, "params": {"from": [0, 4095], "to": [0, 100]}},
-      {"kind": "round", "version": 1, "params": {"decimals": 1}}
+      {"kind": "round", "version": 1, "params": {"mode": "decimal", "decimals": 1}}
     ]
   }
 }

@@ -25,7 +25,7 @@ Widgets that send commands to your devices.
 | **WSlider** | Numeric value slider | `value` (bidir), `min`, `max`, `step` |
 | **WKnob** | Rotary knob for precise adjustment | `value` (bidir), `min`, `max` |
 | **WNumberInput** | Numeric input with +/- buttons | `value` (bidir), `min`, `max`, `step` |
-| **WJoystick** | Two-axis directional control | `position` (emit, {x, y}) |
+| **WJoystick** | Two-axis directional control | `position` (emit, {x, y} in −100…100, y grows downward); `twist` (emit, `geometry_msgs/Twist`, after 0.1.6) |
 | **WDPad** | Directional pad (up/down/left/right) | `up`, `down`, `left`, `right` (emit) |
 | **WEmergencyStop** | Latching E-Stop with confirmation | `trigger` (emit), `active` (in) |
 | **WColorPicker** | RGB/LED color control | `color` (bidir), `change` (emit) |

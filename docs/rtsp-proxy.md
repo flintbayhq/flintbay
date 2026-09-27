@@ -1,109 +1,63 @@
-# RTSP Stream Proxy
+# RTSP Cameras
 
-An RTSP URL typed into a **WStream** widget plays in the browser without opening the camera to the
-internet and without a plugin. The server dials the camera, repackages the video stream and forwards
-it over a WebSocket.
+To show an IP camera that speaks RTSP (or RTMP or SRT) in a **WStream** widget, register it as a
+**media Source** and attach one of its streams to the widget. The built-in media gateway pulls the
+camera once, for every viewer, and delivers WebRTC with an LL-HLS fallback. Latency is well under a
+second on the WebRTC path. See [Live video](environment.md#live-video) for the ports it needs.
 
-> **For a new camera, register a media Source instead.** The proxy on this page spawns **one ffmpeg
-> process and one camera connection per viewer**, and delivers video only. A media Source routes the
-> same camera through the built-in gateway, which pulls it once for every viewer and delivers WebRTC
-> with LL-HLS fallback — sub-second rather than several seconds. See
-> [Live video](environment.md#live-video). This path stays supported for existing widgets and will
-> not be removed without an announced migration.
+> **Typing `rtsp://…` straight into a WStream does not play.** The widget shows **Gateway required —
+> not yet available** instead. Since 0.1.0, a direct RTSP URL has to go through a media Source.
 
-## What Actually Happens
+## Add the Camera
 
-```
-IP camera (RTSP) → ffmpeg, one per viewer (repackage) → WebSocket → browser (MSE)
-```
+1. **Sources** → **Add Source**, kind **Media**, use case **IP camera / live video**.
+2. Enter the stream URL, for example:
 
-The ffmpeg invocation is:
+   ```
+   rtsp://192.168.1.100:554/stream1
+   rtsp://admin:password@192.168.1.100:554/cam/realmonitor?channel=1&subtype=0
+   ```
 
-```
-ffmpeg -rtsp_transport tcp -i <url> -c:v copy -an -f mpegts -flush_packets 1 pipe:1
-```
+   Credentials in the URL stay on the server. The browser receives a media route for the stream,
+   never the camera's address.
+3. Save. Each stream of the Source appears as an endpoint.
+4. Open **Connection Studio**, select the WStream widget, and choose **Attach here** on the stream.
 
-Three consequences follow from that command, and each of them surprises somebody:
-
-**Nothing is re-encoded.** `-c:v copy` repackages the camera's existing video stream into MPEG-TS. It
-does not convert it. The browser therefore has to be able to play whatever the camera already sends,
-which in practice means **H.264** — there is no fallback that would produce it.
-
-**There is no audio.** `-an` drops it. The proxy carries video only.
-
-**Each viewer costs a camera connection.** There is no shared process and no fan-out: two people
-looking at the same camera open two ffmpeg processes and two RTSP sessions. Cameras commonly cap
-concurrent sessions at two or four, which is the usual cause of the third viewer seeing nothing.
+Browser-playable URLs (HLS `…m3u8`, DASH `…mpd`, WHEP, MJPEG, `mp4`/`webm`) can still be typed
+straight into the widget. They play without the gateway.
 
 ## Requirements
 
-- `ffmpeg` on the server's `PATH` — present in the official image. Without it the socket closes with
-  code `1011`.
+- `FLINTBAY_MEDIA_GATEWAY_ENABLED` left at its default `true`.
+- Port `8189` (UDP, and TCP for networks that block UDP) published and reachable from the browser.
+  Without it, playback falls back to LL-HLS over `19580`, about a second slower.
 - Network reachability from the container to the camera.
-- A browser with Media Source Extensions, which is all of them.
-
-## Usage
-
-Place a **WStream** widget and set its stream URL:
-
-```
-rtsp://192.168.1.100:554/stream1
-rtsp://admin:password@192.168.1.100:554/cam/realmonitor?channel=1&subtype=0
-```
-
-The URL never reaches the browser — it is resolved server-side, and the browser is only given the
-WebSocket endpoint. Credentials embedded in it stay on the server.
-
-To switch cameras at runtime, bind the widget's `stream_url` port to an endpoint that supplies the
-address as a string.
-
-## Protocol Handling
-
-WStream picks its transport from the URL, and only RTSP involves the proxy:
-
-| URL | Transport | Proxy |
-|---|---|---|
-| `rtsp://`, `rtsps://` | MPEG-TS over WebSocket | Yes — ffmpeg, one process per viewer |
-| `…m3u8` | HLS | No — the browser plays it |
-| `…mpd` | DASH | No — the browser plays it |
-| `…mjpeg…` | MJPEG | No — a plain `<img>` |
-| `ws://`, `wss://` | Custom | No — the socket is opened directly |
-
-## What the Proxy Refuses
-
-The WebSocket is authenticated before ffmpeg is started: the session cookie, or `?token=` for
-clients that cannot send one. An absent or invalid token closes the socket with `4001`.
-
-The URL is then checked, in this order:
-
-1. The scheme must be `rtsp://` or `rtsps://`.
-2. The URL must contain none of `; | & ` $` or a newline — a shell metacharacter in an address is not
-   a camera, and the address becomes an argument to a subprocess.
-3. If `FLINTBAY_ALLOW_PRIVATE_HOSTS=false`, loopback, private, link-local and reserved literals are
-   refused. The default is `true`, because a camera on the LAN is the normal case.
-4. **Always, regardless of that setting**, the hostname is resolved and the resulting address
-   classified: cloud metadata endpoints (`169.254.169.254` in any spelling) and reserved ranges are
-   refused. This is what stops the field being used to read instance credentials, so it is not
-   configurable.
-
-## Cost
-
-No encoding happens, so CPU is dominated by moving bytes rather than by the resolution of the
-picture — a 1080p stream is not meaningfully more expensive to repackage than a 480p one, while its
-bandwidth is. What scales badly is viewers: each one is a separate process, a separate RTSP session
-and a separate copy of the stream leaving the camera.
-
-If more than one or two people watch the same camera, the media gateway is the right answer rather
-than a tuning exercise on this one.
+- A codec the browser can decode. In practice that means **H.264** video; nothing is re-encoded.
 
 ## Troubleshooting
 
 | Problem | Cause and fix |
 |---|---|
-| Black player, no error | The camera is unreachable from the container. Test it there: `docker exec flintbay ffmpeg -i rtsp://… -t 1 -f null -` |
-| Plays for one person, not the second | The camera's concurrent-session limit. Register it as a media Source so it is pulled once |
-| No sound | Expected — the proxy drops audio |
-| Plays nowhere, camera works in VLC | The camera is probably not sending H.264. Nothing here converts it; switch the camera's codec or use a media Source |
-| Socket closes immediately with `1011` | `ffmpeg` is missing from the image |
-| Socket closes with `4001` | The request carried no valid session |
-| Latency of several seconds | Inherent to this path. Use the camera's sub-stream to reduce it, or the gateway to replace it |
+| **Gateway required — not yet available** on a widget with a typed `rtsp://` URL | Expected: register the camera as a media Source and attach its stream |
+| **Gateway required — not yet available** on an attached stream | The gateway process is not answering. Check it: `docker exec flintbay supervisorctl -c /etc/supervisor/conf.d/flintbay.conf status mediamtx` |
+| An `HLS` badge in the corner of the video | The WebRTC port is not reachable from that browser. Open `8189` in the firewall or security group |
+| Black player, no error | The camera is unreachable from the container, or it sends a codec the browser cannot decode (usually H.265). Switch the camera's stream to H.264 |
+| Works in VLC, not here | Same as above. VLC decodes codecs browsers do not |
+
+## The Legacy `/stream-proxy` Endpoint
+
+The API still serves the older WebSocket at `/api/stream-proxy/ws?url=rtsp://…`. It runs one ffmpeg
+process and one camera connection **per viewer**, repackages the video to MPEG-TS without audio,
+and sends it over the socket. No current widget uses it; it stays for clients built against it and
+will not be removed without an announced migration.
+
+It authenticates the session cookie and refuses URLs that are not `rtsp://` or `rtsps://`, that
+contain shell metacharacters, or that resolve to cloud metadata and reserved address ranges.
+`FLINTBAY_ALLOW_PRIVATE_HOSTS=false` additionally refuses private and loopback targets.
+
+> **In 0.1.6** that check covers only address literals, and a name that resolves to a private
+> address passes. The proxy also logs the camera URL, credentials included, at `INFO`. Its output
+> can stall on a stream that produces many decoder warnings, and it accepts `?token=` in the URL.
+> The next release checks resolved addresses, redacts credentials, reads ffmpeg's diagnostics so
+> they cannot block the stream, and limits each account to 8 concurrent proxy streams (32 in
+> total). It also accepts `?token=` only where `FLINTBAY_REALTIME_ALLOW_QUERY_TOKEN=true`.

@@ -67,9 +67,53 @@ right variant for the host, so the same tag works everywhere:
 | **amd64** (x86_64) | Desktop, server, cloud VMs |
 | **arm64** (aarch64) | Jetson Orin/Nano, Raspberry Pi 4/5 |
 
-> A version tag such as `flintbay:0.2.0` is immutable and covers both
+> A version tag such as `flintbay:0.1.6` is immutable and covers both
 > architectures; `latest` moves only when a stable version is published.
 > Pin a version in production — see [upgrading](docs/upgrading.md).
+
+### Requirements
+
+| | |
+|---|---|
+| **OS** | 64-bit Linux with Docker Engine and Compose v2. On a Raspberry Pi, use a 64-bit OS — there is no 32-bit (armv7) image |
+| **Memory** | About 400 MiB at idle, all services included (measured: 0.1.6, `edge` profile, MCP on, no Sources). Plan for 1 GB free; video streams, many Sources and open dashboards add to it |
+| **Disk** | About 320 MB download, 1.3 GB unpacked. A fresh data volume is about 50 MB and grows with audit and connection logs and with backups |
+| **Network** | Port `19580` for the browser. Port `8189` only for low-latency live video |
+| **Browser** | A current Chrome, Edge, Firefox or Safari, on desktop, tablet or phone |
+
+The memory figure was measured on x86_64. It has not been measured on every
+board, so check memory on your own device before a long unattended run
+(`docker stats flintbay`).
+
+### Works Offline
+
+Once the image is on the device, Flintbay does not need the internet. It needs
+no account, license check or cloud service, and it runs on an isolated
+network, a robot's own Wi-Fi access point, or a machine with no network at all.
+
+Only optional features need connectivity:
+
+- **Update check.** Once a day it downloads the public release list. When
+  offline, it logs the failure and tries again at the next interval. Set
+  `FLINTBAY_UPDATE_ENABLED=false` to turn it off.
+- **Push notifications.** Web Push goes through the browser vendor's push
+  service, so both the deployment and the browser need internet access.
+- **AI clients.** An MCP client talks to its own model provider. Flintbay only
+  serves the `/mcp` endpoint.
+
+To install on an air-gapped machine, copy the image in. Choose the target's
+architecture (`linux/arm64` or `linux/amd64`):
+
+```bash
+# on a connected machine
+docker pull --platform linux/arm64 ghcr.io/flintbayhq/flintbay:0.1.6
+docker save --platform linux/arm64 ghcr.io/flintbayhq/flintbay:0.1.6 | gzip > flintbay-0.1.6.tar.gz
+# on the target
+gunzip -c flintbay-0.1.6.tar.gz | docker load
+```
+
+`docker save --platform` requires Docker 28 or later. On older Docker, drop
+the flag. The `pull --platform` above already chose the architecture.
 
 ```bash
 docker compose up -d
@@ -107,6 +151,46 @@ walks from a fresh deployment to the first live value.
   connection (`telemetry:view`: logs, health, failures) and configuring it (`source:view`, which
   exposes credentials) are separate rights, which is what lets an operator diagnose without
   reading secrets
+
+## How It Runs
+
+One container holds all of Flintbay. A supervisor starts the services inside
+it, so you have one image to deploy, one volume to back up and one thing to
+upgrade:
+
+| Inside the image | Role |
+|---|---|
+| Caddy | Serves the web app, API and MCP on port `19580` |
+| Web app | Vue 3 single-page app, served as static files. It runs in the browser, not on the device |
+| API | Python (FastAPI). Runs the connectors, bindings, realtime WebSocket, auth and audit |
+| PostgreSQL 17 | Stores workspaces, screens, widgets, sources, bindings, users, audit and logs |
+| Redis | Holds rate limits, lockout counters and short-lived runtime state |
+| MediaMTX | Converts RTSP/RTMP/SRT camera streams into WebRTC (port `8189`) and LL-HLS |
+| MCP server | The `/mcp` endpoint for AI clients. Optional |
+
+PostgreSQL and Redis are embedded and listen only inside the container. You do not install
+them, and their passwords are generated on first start. To use your own servers,
+point `FLINTBAY_DATABASE_URL` or `FLINTBAY_REDIS_URL` at them.
+
+## When to Use Something Else
+
+Flintbay builds operator interfaces: an operator sends commands and watches
+live state and video, on a screen someone arranged for that machine. Other
+tools are a better fit for other jobs:
+
+- **Recording and replaying ROS data, 3D scenes, bag files.** Use a robotics
+  visualization tool such as Foxglove or RViz.
+- **Long-term metrics, dashboards over months of data, alerting on time series.**
+  Use Grafana with a time-series database.
+- **Programming logic by wiring flows.** Use Node-RED. Flintbay's bindings carry
+  data between widgets and devices, and transform it on the way. They are not a
+  general automation engine.
+- **Fleets of thousands of devices, device provisioning, multi-tenant IoT.** Use
+  an IoT platform such as ThingsBoard.
+- **Home automation with ready-made device integrations.** Use Home Assistant.
+
+These tools work alongside Flintbay: a robot can publish to MQTT, which feeds
+both Grafana and a Flintbay cockpit.
 
 ## Default Credentials
 
@@ -212,8 +296,8 @@ Set `FLINTBAY_METRICS_ENABLED=false` to disable the endpoint entirely.
 
 Flintbay ships with an **opt-in** memory profiler for diagnosing slow memory growth
 on long-running or resource-constrained deployments (e.g. an edge box). It is
-**completely inert unless enabled** — when off, it adds no overhead and exposes
-no routes, so it is safe to leave in the production image.
+**inert unless enabled**: when off, it adds no overhead and its routes return
+nothing but a note that it is disabled, so it is safe to leave in the production image.
 
 Enable it by setting two environment variables and restarting the container:
 
@@ -243,9 +327,18 @@ sites). Read the data via:
 | `GET /api/debug/memory/redis?limit=N` | Dump the persisted Redis sample list |
 | `GET /api/debug/memory/reset-baseline` | Re-anchor growth tracking to *now* (call after warm-up) |
 
-All routes require `?token=<FLINTBAY_MEMPROF_TOKEN>` when a token is configured
-(mandatory in production; in `dev`/`test` mode the routes are open if no token
-is set).
+All routes require `?token=<FLINTBAY_MEMPROF_TOKEN>` when a token is configured.
+In the image a token is mandatory: without one every route refuses. A refused request
+answers `200` with `{"error": "unauthorized"}`, not `401`, so check the body, not
+only the status.
+
+The token travels in the URL, where reverse-proxy access logs record it. Use a
+throwaway value, and remove it together with `FLINTBAY_MEMPROF_ENABLED` when you
+are done.
+
+> From the next release, a disabled profiler answers `404`, a wrong or missing token
+> answers `401`, and the token can be sent in an `X-Memprof-Token` header, which
+> proxies do not log.
 
 ```bash
 # enable in the container env, then restart
@@ -453,7 +546,7 @@ Change language in the sidebar → your name (bottom of the sidebar) → **User 
 - [API Keys](docs/api-keys.md) — scope presets, `allow_destructive`, rotation
 - [Workspace Sharing](docs/workspace-sharing.md) — roles, invitations, isolation
 - [Push Notifications](docs/push-notifications.md) — Web Push for alerts when the tab is closed
-- [RTSP Stream Proxy](docs/rtsp-proxy.md) — an IP camera in a widget, and why a media Source is better
+- [RTSP Cameras](docs/rtsp-proxy.md) — an IP camera in a widget through a media Source
 
 **Evidence and policy**
 

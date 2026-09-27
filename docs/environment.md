@@ -147,8 +147,11 @@ asks. It cannot be set from inside the container: the setting is not
 per-namespace, and Docker's `--sysctl` refuses it for that reason. Leaving it
 alone costs some packet loss under sustained load and nothing else.
 
-If a camera widget reports **Gateway required — not yet available**, the gateway
-process is not answering. Check it directly:
+If a camera widget attached to a media Source reports **Gateway required — not yet
+available**, the gateway process is not answering. A widget with an `rtsp://` URL
+typed in directly shows the same message, and there it means the camera has to be
+registered as a media Source; see [RTSP cameras](rtsp-proxy.md). Check the gateway
+directly:
 
 ```bash
 docker exec flintbay supervisorctl -c /etc/supervisor/conf.d/flintbay.conf status mediamtx
@@ -169,8 +172,8 @@ credentials, delete `.mediamtx_control_password` and `.mediamtx_read_password`
 from the volume and restart.
 
 Direct browser-playable URLs (HLS, DASH, WHEP, MJPEG) are unaffected and never
-pass through the gateway. Legacy `rtsp://` URLs typed straight into a widget
-still use the older ffmpeg proxy described in [RTSP proxy](rtsp-proxy.md).
+pass through the gateway. An `rtsp://` URL typed straight into a widget does not
+play; register the camera as a media Source instead ([RTSP cameras](rtsp-proxy.md)).
 
 ## Resource Profiles
 

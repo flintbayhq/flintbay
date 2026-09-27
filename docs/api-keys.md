@@ -20,7 +20,9 @@ leaked key from minting more.
 3. Choose a **name**, **scope preset**, and **expiry**
 4. Copy the key immediately — it's shown only once
 
-The key format: `flintbay_pat_<random>` (prefix `flintbay_pat_` identifies it as a Flintbay token).
+The key format is `flintbay_pat_<prefix>_<secret>`: 16 hex characters that identify the key, then
+32 hex characters of secret. The `flintbay_pat_` prefix marks it as a Flintbay token, so secret
+scanners can recognise it.
 
 ## Scope Presets
 
@@ -50,17 +52,20 @@ The presets are not nested: `dashboard` is not `read-only` plus writes — it tr
 ## Allow Destructive
 
 `allow_destructive` decides whether the key may delete anything, and it is a blunt instrument on
-purpose: for a request authenticated by an API key, the flag being `false` refuses **any request whose
+purpose. For a request authenticated by an API key, the flag being `false` refuses **any request whose
 HTTP method is `DELETE`**, whatever the key's scopes say. It is not a per-resource rule, so a
 `dashboard` key without it can create and update screens, pages, widgets, bindings, endpoints and
 sources, and delete none of them.
+
+Changing who belongs to a workspace counts as destructive too, whatever the HTTP method: without the
+flag, a `full` key cannot invite a member, change a member's role or remove a member.
 
 It has one further effect that is easy to miss: applying a Connection Studio plan that reuses an
 existing binding group needs `binding:update`, and a key without `allow_destructive` is refused
 there too — even though applying a plan is a `POST`. Reusing a group rewrites what an existing widget
 is bound to, which is destructive in the sense that matters.
 
-Default: **false**. Rotation preserves the flag.
+Default: **false**. Rotation keeps the flag.
 
 ## Expiry
 
@@ -137,7 +142,7 @@ const ws = new WebSocket(
 
 ## Key Rotation
 
-Rotate a key to get a new secret while keeping the same name and scopes:
+Rotate a key to get a new secret with the same name, scopes and `allow_destructive` flag:
 
 1. Sidebar → **Administration** → **API Keys**
 2. Click the rotate icon on the key
@@ -150,9 +155,25 @@ curl -X POST http://localhost:19580/api/api-keys/{key_id}/rotate \
   -H "Cookie: ..."  # requires web session, not API key
 ```
 
+> **In 0.1.6** the new key gets the default expiry (90 days), not the old key's lifetime. A 7-day
+> key comes back as a 90-day one, and a 365-day key as a 90-day one. The next release keeps the old
+> key's lifetime and swaps the two keys in one transaction.
+
+### Rotating the JWT secret invalidates keys
+
+API keys are stored as HMACs keyed by the JWT secret (see below). In 0.1.6, changing
+`FLINTBAY_JWT_SECRET_KEY` makes every existing key fail with `Invalid API key`. That includes
+moving from the auto-generated secret to an explicit one. `FLINTBAY_JWT_PREVIOUS_SECRET_KEY` does
+not help, so create or rotate the keys again afterwards.
+
+From the next release, a key that matches the previous secret is accepted and moved to the new
+one the first time it is used. Keep `FLINTBAY_JWT_PREVIOUS_SECRET_KEY` set until every key has
+been used at least once, or rotate the keys that were not.
+
 ## Security Notes
 
-- Keys are stored as bcrypt hashes — the plaintext is never stored
+- Keys are stored as HMAC-SHA256 digests keyed by the JWT secret, and compared in constant time. The
+  plaintext is never stored
 - Key management endpoints require **web session auth** — you cannot use an API key to create/revoke other keys (prevents escalation if a key is compromised)
 - Keys track `last_used_at` and `last_used_ip` for auditing
 - Revocation is immediate and irreversible
