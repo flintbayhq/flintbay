@@ -54,16 +54,19 @@ To rotate the JWT signing key without invalidating all active sessions:
 
 During the transition window, Flintbay accepts tokens signed with either key.
 
-Two more things are keyed by the JWT secret, and in 0.1.6 the previous key does not cover them:
+Two more things are keyed by the JWT secret, and the previous key covers them too:
 
-- **API keys** stop working as soon as the secret changes; see
-  [API Keys](api-keys.md#rotating-the-jwt-secret-invalidates-keys).
-- **Refresh tokens** are hashed with it unless `FLINTBAY_SESSION_REFRESH_TOKEN_SECRET` is set. After a
-  rotation, every browser is signed out when its access token next expires.
+- **API keys**: a key issued under the previous secret is accepted and moved to the new one the
+  first time it is used; see [API Keys](api-keys.md#rotating-the-jwt-secret).
+- **Refresh tokens**, unless `FLINTBAY_SESSION_REFRESH_TOKEN_SECRET` is set: a token issued under the
+  previous secret still refreshes, and its successor is stored under the new one.
 
-To make future JWT rotations leave sessions alone, set `FLINTBAY_SESSION_REFRESH_TOKEN_SECRET` to its
-own random value. Setting it for the first time also signs everyone out once. From the next
-release, the previous JWT secret also covers refresh tokens and API keys, as long as it stays set.
+Both only work while `FLINTBAY_JWT_PREVIOUS_SECRET_KEY` is set. Keep it longer than the 30 minutes
+above: until every API key has been used once, and ideally for the refresh token lifetime (30 days).
+Anything not used before you remove it stops working.
+
+> **Before 0.1.7**, the previous key covered neither: a JWT rotation broke every API key and signed
+> every browser out when its access token next expired.
 
 ## Session Management
 
@@ -82,11 +85,11 @@ release, the previous JWT secret also covers refresh tokens and API keys, as lon
 - Every refresh replaces the refresh token. Presenting a replaced token again is treated as theft,
   and every session of that account is revoked.
 
-> **In 0.1.6** two refreshes that present the same token at the same moment both succeed, and the
-> theft check does not see it. The next release lets only one of them replace the token. A copy of
-> the old token that arrives within 10 seconds of the replacement is treated as a second tab of the
-> same browser and gets an access token. After that it counts as theft
-> (`FLINTBAY_SESSION_REFRESH_REUSE_GRACE_SECONDS`, 0 disables the grace).
+- Of two refreshes presenting the same token at the same moment, only one replaces it. A replaced
+  token that arrives within 10 seconds is treated as a second tab of the same browser: it gets an
+  access token and no new refresh token, and the event is logged. After that it counts as theft
+  (`FLINTBAY_SESSION_REFRESH_REUSE_GRACE_SECONDS`, `0` disables the grace). Before 0.1.7 both
+  refreshes succeeded and the theft check did not see it.
 
 ### Cookie Settings
 

@@ -207,7 +207,7 @@ There is one exception: a port whose value is already a complete message is sent
 itself when its path is empty or is the port's own name. WJoystick's `twist` port works this way,
 so a `geometry_msgs/Twist` reaches `cmd_vel` unwrapped, and the key Connection Studio proposes
 (`twist`) is the right one. Any other path nests it as usual. Paths from other Mappings in the same
-group are added into the message. The `twist` port arrives in the release after 0.1.6; see the
+group are added into the message. The `twist` port exists from 0.1.7; see the
 [TurtleBot example](examples/ros2-turtlebot.md).
 
 A port path can only be the port name as a whole, so one Mapping cannot send `position.x` and

@@ -49,6 +49,13 @@ Released 2026-09-27.
 - A `chain` transform with an invalid step is refused when the binding is saved, and the error names
   the step. It used to be saved and then fail on every message.
 
+```
+ghcr.io/flintbayhq/flintbay:0.1.7
+index  sha256:334a697773dca690d30f5d7a2722736e03b18f5f3b7cc1b37db3e29637f91bd3
+amd64  sha256:7a725be71f874b7f6627f2b8e2e79c0917ab418c7751c3553d3de01d420b7c3c
+arm64  sha256:261834e4c86a2fdd2bd566d663ba2dd3e8e2c4c5ef7932fbd2420a62603126e4
+```
+
 ## 0.1.6
 
 Released 2026-09-23.

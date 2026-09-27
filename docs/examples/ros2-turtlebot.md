@@ -19,7 +19,7 @@ Flintbay connects to ROS 2 via [rosbridge_suite](https://github.com/RobotWebTool
 - ROS 2 Humble/Iron/Jazzy with TurtleBot3 packages
 - `rosbridge_server` running
 - Flintbay instance ([Getting Started](../getting-started.md))
-- For the joystick: a Flintbay release newer than 0.1.6 (see [Joystick → /cmd_vel](#joystick--cmd_vel))
+- For the joystick: Flintbay 0.1.7 or later (see [Joystick → /cmd_vel](#joystick--cmd_vel))
 
 ## 1. Launch rosbridge
 
@@ -115,10 +115,10 @@ The joystick's own settings still apply before the conversion: **Dead Zone** sto
 Curve** softens small movements, **Rate** scales everything down, and **Throttle** limits how often
 it sends.
 
-> **0.1.6 has no `twist` port.** Its joystick only emits `position` as `{x, y}` in −100…100, and a
-> transform cannot rescale an object's fields, so 0.1.6 has no way to produce a valid, scaled Twist
-> from the joystick. Bindings that apply `map_range` to `position` fail on every message. Upgrade
-> for joystick driving; the rest of this example works on 0.1.6.
+> **Before 0.1.7 there is no `twist` port.** The joystick only emits `position` as `{x, y}` in
+> −100…100, and a transform cannot rescale an object's fields, so older versions cannot produce a
+> valid, scaled Twist from the joystick. Bindings that apply `map_range` to `position` fail on every
+> message. Upgrade for joystick driving; the rest of this example works on 0.1.6 too.
 
 ### Battery State
 

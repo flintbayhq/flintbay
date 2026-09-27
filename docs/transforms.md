@@ -20,10 +20,9 @@ A transform is a JSON object with `kind`, `version` and `params`:
 {"kind": "scale", "version": 1, "params": {"factor": 0.01}}
 ```
 
-A transform whose params are invalid is rejected when the binding is saved. In 0.1.6 this check
-does not reach the steps inside a `chain`: an invalid step is saved, and then fails on every
-message. Test a chain with known values before you rely on it. From the next release, a chain is
-refused on save and the error names the failing step, e.g. `Invalid chain step 1 (cast)`.
+A transform whose params are invalid is rejected when the binding is saved, including every step
+inside a `chain`; the error names the failing step, e.g. `Invalid chain step 1 (cast)`. Before
+0.1.7, an invalid chain step was saved and then failed on every message.
 
 Every example on this page has been run against the transform engine, and the tables show its
 actual output.
@@ -211,11 +210,12 @@ Smooth a value with an exponential moving average:
 |---|---|
 | 0, 100, 100, 100 | 0.0, 20.0, 36.0, 48.8 |
 
-> **Known issue in 0.1.6:** in bindings, the filter's memory is not kept between messages, so
-> `lowpass` passes values through unchanged. Smooth on the device until you upgrade. The next
-> release fixes this. Each mapping and each direction then keeps its own filter memory, even when
-> two mappings use the same `state_key`, and replaying the last value to a page that has just
-> opened does not move the filter.
+Each mapping and each direction keeps its own filter memory, even when two mappings use the same
+`state_key`, and replaying the last value to a page that has just opened does not move the filter.
+The memory lives in the API process, so a restart starts every filter again from its next input.
+
+> **Before 0.1.7**, `lowpass` in a binding forgot its memory with every message and passed values
+> through unchanged.
 
 **Use case:** Smooth noisy sensor readings and reduce jitter on displays.
 
@@ -425,6 +425,6 @@ Or via MCP:
 - Add a transform only when the raw data does not match what the widget expects.
 - Prefer `payload_path` to `pick` for selecting a single value.
 - Use `chain` to combine several simple transforms instead of a custom one.
-- `lowpass` with an alpha of 0.1–0.3 suits most noisy sensors. Mind the 0.1.6 known issue above.
+- `lowpass` with an alpha of 0.1–0.3 suits most noisy sensors.
 - A `deadzone` threshold of 0.05–0.15 suits most joysticks.
 - Test a transform by publishing known values and checking the widget's output.

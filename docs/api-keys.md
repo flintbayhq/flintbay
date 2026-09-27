@@ -155,20 +155,23 @@ curl -X POST http://localhost:19580/api/api-keys/{key_id}/rotate \
   -H "Cookie: ..."  # requires web session, not API key
 ```
 
-> **In 0.1.6** the new key gets the default expiry (90 days), not the old key's lifetime. A 7-day
-> key comes back as a 90-day one, and a 365-day key as a 90-day one. The next release keeps the old
-> key's lifetime and swaps the two keys in one transaction.
+The new key keeps the old key's scopes exactly and its lifetime length, capped at the maximum
+expiry. Revoking the old key and creating the new one happen in one step, so a failure leaves the
+old key working. An expired key cannot be rotated; create a new one.
 
-### Rotating the JWT secret invalidates keys
+> Before 0.1.7, a rotated key got the default 90 days whatever its lifetime was. A key whose scopes
+> matched no current preset came back as `full`.
 
-API keys are stored as HMACs keyed by the JWT secret (see below). In 0.1.6, changing
-`FLINTBAY_JWT_SECRET_KEY` makes every existing key fail with `Invalid API key`. That includes
-moving from the auto-generated secret to an explicit one. `FLINTBAY_JWT_PREVIOUS_SECRET_KEY` does
-not help, so create or rotate the keys again afterwards.
+### Rotating the JWT secret
 
-From the next release, a key that matches the previous secret is accepted and moved to the new
-one the first time it is used. Keep `FLINTBAY_JWT_PREVIOUS_SECRET_KEY` set until every key has
-been used at least once, or rotate the keys that were not.
+API keys are stored as HMACs keyed by the JWT secret (see below). When the secret changes with
+`FLINTBAY_JWT_PREVIOUS_SECRET_KEY` set to the old one, a key that matches the previous secret is
+accepted and moved to the new one the first time it is used. Keep the previous secret set until
+every key has been used at least once, or rotate the keys that were not. This includes moving from
+the auto-generated secret (`/var/lib/flintbay/.jwt_secret`) to an explicit one: set the previous
+secret to the generated value.
+
+> Before 0.1.7, any change of the JWT secret made every existing key fail with `Invalid API key`.
 
 ## Security Notes
 

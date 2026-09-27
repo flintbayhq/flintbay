@@ -67,7 +67,7 @@ right variant for the host, so the same tag works everywhere:
 | **amd64** (x86_64) | Desktop, server, cloud VMs |
 | **arm64** (aarch64) | Jetson Orin/Nano, Raspberry Pi 4/5 |
 
-> A version tag such as `flintbay:0.1.6` is immutable and covers both
+> A version tag such as `flintbay:0.1.7` is immutable and covers both
 > architectures; `latest` moves only when a stable version is published.
 > Pin a version in production — see [upgrading](docs/upgrading.md).
 
@@ -106,10 +106,10 @@ architecture (`linux/arm64` or `linux/amd64`):
 
 ```bash
 # on a connected machine
-docker pull --platform linux/arm64 ghcr.io/flintbayhq/flintbay:0.1.6
-docker save --platform linux/arm64 ghcr.io/flintbayhq/flintbay:0.1.6 | gzip > flintbay-0.1.6.tar.gz
+docker pull --platform linux/arm64 ghcr.io/flintbayhq/flintbay:0.1.7
+docker save --platform linux/arm64 ghcr.io/flintbayhq/flintbay:0.1.7 | gzip > flintbay-0.1.7.tar.gz
 # on the target
-gunzip -c flintbay-0.1.6.tar.gz | docker load
+gunzip -c flintbay-0.1.7.tar.gz | docker load
 ```
 
 `docker save --platform` requires Docker 28 or later. On older Docker, drop
@@ -327,18 +327,16 @@ sites). Read the data via:
 | `GET /api/debug/memory/redis?limit=N` | Dump the persisted Redis sample list |
 | `GET /api/debug/memory/reset-baseline` | Re-anchor growth tracking to *now* (call after warm-up) |
 
-All routes require `?token=<FLINTBAY_MEMPROF_TOKEN>` when a token is configured.
-In the image a token is mandatory: without one every route refuses. A refused request
-answers `200` with `{"error": "unauthorized"}`, not `401`, so check the body, not
-only the status.
+While the profiler is disabled, every route answers `404`. Once enabled, every route
+requires the token: in the image it is mandatory, and without one every route
+refuses. A wrong or missing token answers `401`.
 
-The token travels in the URL, where reverse-proxy access logs record it. Use a
-throwaway value, and remove it together with `FLINTBAY_MEMPROF_ENABLED` when you
-are done.
+Send the token in the `X-Memprof-Token` header. `?token=` also works, but reverse-proxy
+access logs record URLs. Remove the token together with `FLINTBAY_MEMPROF_ENABLED` when
+you are done.
 
-> From the next release, a disabled profiler answers `404`, a wrong or missing token
-> answers `401`, and the token can be sent in an `X-Memprof-Token` header, which
-> proxies do not log.
+> Before 0.1.7, a disabled profiler answered `200` with a hint, a refused request
+> answered `200` with `{"error": "unauthorized"}`, and only `?token=` was accepted.
 
 ```bash
 # enable in the container env, then restart
@@ -346,8 +344,8 @@ FLINTBAY_MEMPROF_ENABLED=1
 FLINTBAY_MEMPROF_TOKEN=<your-secret>
 
 # after warm-up, re-anchor and then watch the trend
-curl "http://localhost:19580/api/debug/memory/reset-baseline?token=<your-secret>"
-curl "http://localhost:19580/api/debug/memory/history?token=<your-secret>&limit=30"
+curl -H "X-Memprof-Token: <your-secret>" "http://localhost:19580/api/debug/memory/reset-baseline"
+curl -H "X-Memprof-Token: <your-secret>" "http://localhost:19580/api/debug/memory/history?limit=30"
 ```
 
 > **Note:** the profiler uses Python's `tracemalloc`, which adds measurable CPU

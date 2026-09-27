@@ -51,13 +51,12 @@ process and one camera connection **per viewer**, repackages the video to MPEG-T
 and sends it over the socket. No current widget uses it; it stays for clients built against it and
 will not be removed without an announced migration.
 
-It authenticates the session cookie and refuses URLs that are not `rtsp://` or `rtsps://`, that
-contain shell metacharacters, or that resolve to cloud metadata and reserved address ranges.
-`FLINTBAY_ALLOW_PRIVATE_HOSTS=false` additionally refuses private and loopback targets.
+It authenticates the session cookie, and accepts `?token=` only where
+`FLINTBAY_REALTIME_ALLOW_QUERY_TOKEN=true`. It refuses URLs that are not `rtsp://` or `rtsps://`,
+that contain shell metacharacters, or that resolve to cloud metadata and reserved address ranges.
+`FLINTBAY_ALLOW_PRIVATE_HOSTS=false` additionally refuses hosts that are, or resolve to, private
+and loopback addresses. Camera credentials are removed from its logs. Each account may hold 8
+concurrent proxy streams, and the deployment 32.
 
-> **In 0.1.6** that check covers only address literals, and a name that resolves to a private
-> address passes. The proxy also logs the camera URL, credentials included, at `INFO`. Its output
-> can stall on a stream that produces many decoder warnings, and it accepts `?token=` in the URL.
-> The next release checks resolved addresses, redacts credentials, reads ffmpeg's diagnostics so
-> they cannot block the stream, and limits each account to 8 concurrent proxy streams (32 in
-> total). It also accepts `?token=` only where `FLINTBAY_REALTIME_ALLOW_QUERY_TOKEN=true`.
+> Before 0.1.7, the private-host check covered only address literals and the camera URL was logged
+> with its credentials. The proxy could also stall on a stream that produced many decoder warnings.
