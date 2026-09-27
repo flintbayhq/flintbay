@@ -11,6 +11,44 @@ about the deployment is sent anywhere.
 Headings are the bare version, so the anchor for a version is its number without the dots:
 `#012` for 0.1.2.
 
+## 0.1.7
+
+Released 2026-09-27.
+
+- Security: refresh tokens can no longer be raced. Two refreshes presenting the same token at the
+  same moment used to both succeed, and the check that revokes every session when a replaced token
+  comes back did not see it. Now only one replaces the token. A second tab of the same browser within
+  10 seconds gets an access token and nothing more
+  (`FLINTBAY_SESSION_REFRESH_REUSE_GRACE_SECONDS`), and each use of that window is logged. Later
+  reuse is treated as theft, as before.
+- Security: a signed-in request belongs to the account its session belongs to, not to the username
+  written in the token. Renaming an account no longer breaks its open sessions, and its old name,
+  once given to someone else, no longer lets a still-valid token act as that account.
+- Security: rotating an API key keeps exactly its scopes and its lifetime. A key whose scopes matched
+  no current preset came back as a `full` key, every rotated key came back with 90 days, and an
+  expired key could be rotated back to life. Revoking the old key and creating the new one are now
+  one step, so a failure leaves the old key working.
+- Security: the legacy `/api/stream-proxy` socket no longer logs camera passwords. It refuses names
+  that resolve to private addresses when `FLINTBAY_ALLOW_PRIVATE_HOSTS=false`, and limits each
+  account to 8 concurrent streams (32 in total). It also accepts `?token=` only where query tokens
+  are enabled, and it no longer freezes on a stream that produces many decoder warnings.
+- Security: the memory profiler's routes answer `404` while it is disabled and `401` for a wrong
+  token, instead of `200`. The token is compared in constant time and can be sent in an
+  `X-Memprof-Token` header, which proxies do not log.
+- Rotating the JWT secret with `FLINTBAY_JWT_PREVIOUS_SECRET_KEY` set no longer breaks API keys or
+  signs everyone out. A key or refresh token issued under the previous secret is accepted and moved
+  to the new one when it is next used.
+- The joystick can drive a robot directly. A new `twist` port sends a ready `geometry_msgs/Twist`:
+  stick up drives forward, stick right turns right, and releasing the stick sends a zero Twist (with
+  Return to Center on, the default). Two new settings cap the speed (m/s) and turn rate (rad/s). Bound
+  to a `cmd_vel` topic it is sent as the whole message, so the key Connection Studio proposes works
+  as-is. It is sent only while bound, so existing joysticks send exactly what they did before.
+- `lowpass` smooths. In a binding, the filter forgot its previous value with every message and passed
+  readings through unchanged. Each mapping and each direction now keeps its own filter memory, and
+  a page that has just opened does not nudge it.
+- A `chain` transform with an invalid step is refused when the binding is saved, and the error names
+  the step. It used to be saved and then fail on every message.
+
 ## 0.1.6
 
 Released 2026-09-23.
