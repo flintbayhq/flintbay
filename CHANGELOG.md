@@ -15,6 +15,10 @@ Headings are the bare version, so the anchor for a version is its number without
 
 Released 2026-10-05.
 
+- Security: carries PyJWT 2.15.1. The previous version had advisories for token forgery and
+  authentication bypass (CVE-2026-102268 and five related ones).
+- Security: carries urllib3 2.8.0, axios 1.20.0 and DOMPurify 3.4.16, and the current Debian fixes
+  for OpenSSL, PCRE2 and the bundled Redis.
 - A new page says what to do next. A page with no widgets shows a card in the middle of the canvas:
   turn on the editor, or add the first widget. A reader who may not edit is told the page is empty.
 - The add-widget button is larger.
