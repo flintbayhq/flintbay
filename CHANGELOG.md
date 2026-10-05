@@ -11,6 +11,20 @@ about the deployment is sent anywhere.
 Headings are the bare version, so the anchor for a version is its number without the dots:
 `#012` for 0.1.2.
 
+## 0.1.8
+
+Released 2026-10-05.
+
+- A new page says what to do next. A page with no widgets shows a card in the middle of the canvas:
+  turn on the editor, or add the first widget. A reader who may not edit is told the page is empty.
+- The add-widget button is larger.
+- Connection Studio shows where a connection goes, whatever is collapsed. Pointing at a port, a field
+  or a feed lights exactly one row for each end of its connections: the end itself, or, faintly, the
+  closed source, feed, field or widget it is hidden in. The line ends on that same row. Pointing at an
+  object field lights the bound fields inside it.
+- Every Connection Studio row highlights across its full width, and pointing anywhere on it shows its
+  connections, not only over its label. Grey means the cursor alone; blue means part of a connection.
+
 ## 0.1.7
 
 Released 2026-09-27.
