@@ -29,6 +29,13 @@ Released 2026-10-05.
 - Every Connection Studio row highlights across its full width, and pointing anywhere on it shows its
   connections, not only over its label. Grey means the cursor alone; blue means part of a connection.
 
+```
+ghcr.io/flintbayhq/flintbay:0.1.8
+index  sha256:8eb9de734173d540c7a87d6da79e81cc2facf33a697c7b732eb52f608090e474
+amd64  sha256:8ad9fda84ef6268321990387673f8c919555f3f2de74653f348bad2dd574eb3c
+arm64  sha256:7cccf9042a5e46fc7ab0edcc064aec4023271fa506d2af1d537e9b6f65e7939b
+```
+
 ## 0.1.7
 
 Released 2026-09-27.

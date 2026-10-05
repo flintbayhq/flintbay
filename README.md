@@ -67,7 +67,7 @@ right variant for the host, so the same tag works everywhere:
 | **amd64** (x86_64) | Desktop, server, cloud VMs |
 | **arm64** (aarch64) | Jetson Orin/Nano, Raspberry Pi 4/5 |
 
-> A version tag such as `flintbay:0.1.7` is immutable and covers both
+> A version tag such as `flintbay:0.1.8` is immutable and covers both
 > architectures; `latest` moves only when a stable version is published.
 > Pin a version in production — see [upgrading](docs/upgrading.md).
 
@@ -106,10 +106,10 @@ architecture (`linux/arm64` or `linux/amd64`):
 
 ```bash
 # on a connected machine
-docker pull --platform linux/arm64 ghcr.io/flintbayhq/flintbay:0.1.7
-docker save --platform linux/arm64 ghcr.io/flintbayhq/flintbay:0.1.7 | gzip > flintbay-0.1.7.tar.gz
+docker pull --platform linux/arm64 ghcr.io/flintbayhq/flintbay:0.1.8
+docker save --platform linux/arm64 ghcr.io/flintbayhq/flintbay:0.1.8 | gzip > flintbay-0.1.8.tar.gz
 # on the target
-gunzip -c flintbay-0.1.7.tar.gz | docker load
+gunzip -c flintbay-0.1.8.tar.gz | docker load
 ```
 
 `docker save --platform` requires Docker 28 or later. On older Docker, drop
