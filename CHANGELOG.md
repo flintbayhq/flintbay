@@ -27,6 +27,13 @@ Released 2026-10-15.
   Vue 3.5.44, PrimeVue 5.0.2, Pinia 4.1 and Vite 8.3 in the browser. Nothing changes in how
   Flintbay is configured or run.
 
+```
+ghcr.io/flintbayhq/flintbay:0.1.9
+index  sha256:a20e9c9ad74dd5048ffd9ef6c51a711688aa3fb42018f926ee3dc9460e680aef
+amd64  sha256:b5e3d93e913f3a296674095c47bfff8b1204b2fafe1d05ae252a1515c635d546
+arm64  sha256:edee5f320aa738b096ed82be9b600b2731ab5ff17ef2f2115cef66835ce7aaf3
+```
+
 ## 0.1.8
 
 Released 2026-10-05.
