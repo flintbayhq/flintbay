@@ -11,6 +11,22 @@ about the deployment is sent anywhere.
 Headings are the bare version, so the anchor for a version is its number without the dots:
 `#012` for 0.1.2.
 
+## 0.1.9
+
+Released 2026-10-15.
+
+- Security: carries MediaMTX 1.21.2, which also refuses cross-site browser `POST`s from origins
+  outside its allow list. The Go standard library advisories for HTTP/2 and TLS that 0.1.8 carried
+  are fixed. One `golang.org/x/net` advisory (CVE-2026-78669) remains until MediaMTX publishes its
+  fix; the media gateway's HTTP listeners are reachable only through the built-in proxy, over
+  HTTP/1.1, so its HTTP/2 server is never exposed.
+- Security: carries the current Debian fixes for curl (CVE-2026-8286, CVE-2026-8927,
+  CVE-2026-92392).
+- Every dependency moved to its current release: FastAPI 0.143, Starlette 1.8, uvicorn 0.54,
+  pydantic 2.14, SQLAlchemy 2.1, Alembic 1.20, websockets 17 and cryptography 50.0.2 on the server;
+  Vue 3.5.44, PrimeVue 5.0.2, Pinia 4.1 and Vite 8.3 in the browser. Nothing changes in how
+  Flintbay is configured or run.
+
 ## 0.1.8
 
 Released 2026-10-05.
