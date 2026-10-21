@@ -11,6 +11,26 @@ about the deployment is sent anywhere.
 Headings are the bare version, so the anchor for a version is its number without the dots:
 `#012` for 0.1.2.
 
+## 0.1.10
+
+Released 2026-10-22.
+
+- Connecting a widget on the page that is already open shows its data at once. MQTT, WebSocket and
+  ROS 2 widgets used to say "No data" until the page was reloaded.
+- A pasted camera address can be added. The track type and direction are asked as plain choices
+  instead of a JSON editor, the Endpoint no longer fails validation after its Source was created,
+  and a camera attached from the widget's own Bindings tab stays attached after leaving the editor.
+- A second address from the same device — a camera on RTSP and telemetry on REST, say — gets its
+  own Source named after its kind instead of failing with "source already exists". Abandoning a
+  paste halfway no longer leaves an empty Source behind, and a ROS 2 bridge or broker pasted
+  without a topic can be opened to choose what to read.
+- A joystick held still keeps the robot moving: repeated commands are sent, not dropped as
+  "unchanged", so the robot's own watchdog no longer stops it between them. Controls that only send
+  no longer wear a "No data" marker.
+- Smaller fixes: a text size such as 2.5 can be typed; a Gauge that is not connected yet previews a
+  value inside its own range; the widget palette stays open while a widget is dragged from it; the
+  Compass letters scale to the dial.
+
 ## 0.1.9
 
 Released 2026-10-15.
