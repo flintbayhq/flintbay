@@ -15,6 +15,13 @@ Headings are the bare version, so the anchor for a version is its number without
 
 Released 2026-10-22.
 
+- Security: carries certifi 2026.10.19, which no longer trusts the emSign ECC Root CA - G3 after
+  eight of its eMudhra intermediates were compromised (GHSA-6q48-6c7w-9gw2). MediaMTX 1.21.2, still
+  the latest release, predates Go's hard block of those intermediates (CVE-2026-111943); the media
+  gateway verifies against the image's system store, which holds no emSign G3 root, so no chain
+  through them can be built.
+- Security: carries the current Debian fixes for expat (CVE-2026-66046, CVE-2026-76956,
+  CVE-2026-76957, CVE-2026-77214, CVE-2026-93990).
 - Connecting a widget on the page that is already open shows its data at once. MQTT, WebSocket and
   ROS 2 widgets used to say "No data" until the page was reloaded.
 - A pasted camera address can be added. The track type and direction are asked as plain choices
