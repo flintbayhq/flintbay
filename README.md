@@ -224,7 +224,6 @@ over resource-profile defaults.
 | `FLINTBAY_MEDIA_WEBRTC_PORT` | `8189` | Live-video transport port; publish it with equal host and container numbers |
 | `FLINTBAY_MEDIA_WEBRTC_HOST` | *(derived)* | ICE candidate host; set only when media is reached through another address than `FLINTBAY_PUBLIC_URL` |
 | `FLINTBAY_MEDIA_GATEWAY_ENABLED` | `true` | Live video for `rtsp://` / `rtmp://` / `srt://` Sources |
-| `FLINTBAY_API_ENABLE_DOCS` | `false` | Enable Swagger UI at `/api/docs` |
 | `FLINTBAY_LOG_LEVEL` | `WARNING` | API log level |
 | `FLINTBAY_METRICS_ENABLED` | `true` | Enable Prometheus `/metrics` |
 | `FLINTBAY_MCP_ENABLE` | `true` | Enable bundled MCP; disabling saves about 43–44 MiB cgroup RAM |

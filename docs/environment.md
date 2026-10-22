@@ -75,7 +75,6 @@ query, or fragment.
 | `FLINTBAY_COOKIE_DOMAIN` | empty/request host | Optional cookie-domain override. |
 | `FLINTBAY_TRUSTED_PROXIES` | empty | Comma-separated proxy IPs/CIDRs trusted for forwarded client addresses. |
 | `FLINTBAY_ALLOW_PRIVATE_HOSTS` | `true` | Allows robot/IoT source URLs on private networks. |
-| `FLINTBAY_API_ENABLE_DOCS` | `false` | Enables OpenAPI/Swagger routes in production. |
 | `FLINTBAY_LOG_LEVEL` | `WARNING` | API log level. |
 | `FLINTBAY_METRICS_ENABLED` | `true` | Enables Prometheus `/metrics`. |
 | `FLINTBAY_MCP_ENABLE` | `true` | Enables bundled MCP; `false` saves about 43–44 MiB cgroup RAM. |
@@ -231,3 +230,7 @@ set one, it is ignored rather than honoured, and the setting keeps its default.
 
 Do not use retired developer-template names such as `MCP_ENABLE`, root
 `FLINTBAY_API_KEY`, or `VITE_MCP_URL`. They were not production image contracts.
+
+`FLINTBAY_API_ENABLE_DOCS` is retired. The image never serves Swagger UI, ReDoc or
+`/api/openapi.json`, whatever the environment says; setting the variable has no effect and
+startup logs a warning that it is still present.
