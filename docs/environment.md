@@ -1,7 +1,7 @@
 # Environment Variables
 
 This page documents the supported environment contract for the Flintbay all-in-one
-image. The image contains the API, Web UI, Caddy, MCP, PostgreSQL, and Redis.
+image. The image contains the API, Web UI, Caddy, MCP, PostgreSQL, Redis and the MediaMTX media gateway.
 PostgreSQL and Redis are embedded by default and can be replaced independently.
 
 ## Contract and Precedence

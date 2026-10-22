@@ -116,6 +116,13 @@ if absent, reactivated if disabled, and its password reapplied whenever
 `FLINTBAY_SUPERADMIN_PASSWORD` changes. That last part is the recovery path — lost the
 password, change the variable and restart.
 
+### `FLINTBAY_API_ENABLE_DOCS` no longer does anything
+
+From 0.1.11 the image never serves Swagger UI, ReDoc or `/api/openapi.json`, whatever the
+environment says. Upgrading needs no edit: if the variable is still set, startup logs a warning and
+otherwise ignores it. Remove it from your Compose file to silence the warning. Tooling that fetched
+`/api/openapi.json` from a deployment has to get the schema some other way.
+
 ## Backup Before Upgrade
 
 ```bash
@@ -190,6 +197,8 @@ After upgrading, confirm the container is running what you intended:
 ```bash
 docker exec flintbay cat /app/release.json
 ```
+
+It reports `version`, the git revision and `protection` — `nuitka` from 0.1.11 on.
 
 ## ARM64 (Jetson / Raspberry Pi)
 
