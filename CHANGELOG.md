@@ -38,6 +38,13 @@ Released 2026-10-22.
   value inside its own range; the widget palette stays open while a widget is dragged from it; the
   Compass letters scale to the dial.
 
+```
+ghcr.io/flintbayhq/flintbay:0.1.10
+index  sha256:c13ea7296dd75b645cfb2952b2294eb00ea7c4739b3589931ff1dedddfd85b5e
+amd64  sha256:f740d17f8be321b47fb703a7a3b3aff343519d05af0b0c47641f1f55bbb09921
+arm64  sha256:c743aeaf121981292d4657adcef8d4319a06be007f4c325c0b794034f44c7031
+```
+
 ## 0.1.9
 
 Released 2026-10-15.
