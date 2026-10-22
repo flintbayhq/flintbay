@@ -145,7 +145,6 @@ services:
       # FLINTBAY_UPDATE_INTERVAL_HOURS: "24"
 
       ## ─── API and diagnostics ──────────────────────────────────────────
-      # FLINTBAY_API_ENABLE_DOCS: "true"
       # FLINTBAY_LOG_LEVEL: "WARNING"
       # FLINTBAY_MEMPROF_ENABLED: "1"
       # FLINTBAY_MEMPROF_TOKEN: "change-me"
