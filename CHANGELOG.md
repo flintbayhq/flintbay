@@ -11,6 +11,22 @@ about the deployment is sent anywhere.
 Headings are the bare version, so the anchor for a version is its number without the dots:
 `#012` for 0.1.2.
 
+## 0.1.11
+
+Released 2026-10-23.
+
+- Security: the application inside the image is now compiled to native machine code for both
+  architectures. No Python source or bytecode ships, so the API and MCP server can no longer be
+  read back with decompilers or unpacking tools.
+- Security: the image no longer serves Swagger UI, ReDoc or `/api/openapi.json`, in any mode.
+  `FLINTBAY_API_ENABLE_DOCS` is retired and only logs a warning if it is still set.
+- The command audit trail records what a command actually sent again — the delivered value and
+  its counts — instead of only that something was sent.
+- Video and stream widgets play through an updated video.js integration.
+- The image's licence label names the [EULA](EULA.txt) that governs it; earlier images wrongly
+  said MIT.
+- Nothing changes in how Flintbay is configured or run.
+
 ## 0.1.10
 
 Released 2026-10-22.
