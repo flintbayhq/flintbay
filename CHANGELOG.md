@@ -13,19 +13,33 @@ Headings are the bare version, so the anchor for a version is its number without
 
 ## 0.1.11
 
-Released 2026-10-23.
+Released 2026-10-22.
 
-- Security: the application inside the image is now compiled to native machine code for both
-  architectures. No Python source or bytecode ships, so the API and MCP server can no longer be
-  read back with decompilers or unpacking tools.
+- Security: the API and MCP server are now compiled to native machine code (Nuitka) for both
+  architectures, replacing PyArmor. No Python source or bytecode ships, and the API's explanatory
+  docstrings are stripped, so there is nothing left for a Python decompiler or unpacker to recover.
+- The protection metadata follows: `/app/release.json` reports `"protection": "nuitka"`,
+  `/app/protection.json` has profile `nuitka`, and the OCI labels
+  `io.flintbay.protection.profile=nuitka` and `io.flintbay.protection.tool=nuitka-4.3.1` replace
+  `io.flintbay.protection.pyarmor`. Anything that checked the old label or value needs updating.
 - Security: the image no longer serves Swagger UI, ReDoc or `/api/openapi.json`, in any mode.
   `FLINTBAY_API_ENABLE_DOCS` is retired and only logs a warning if it is still set.
 - The command audit trail records what a command actually sent again — the delivered value and
   its counts — instead of only that something was sent.
 - Video and stream widgets play through an updated video.js integration.
-- The image's licence label names the [EULA](EULA.txt) that governs it; earlier images wrongly
-  said MIT.
-- Nothing changes in how Flintbay is configured or run.
+- The image's licence label, `org.opencontainers.image.licenses`, is now
+  `LicenseRef-Flintbay-EULA`, and the new labels `io.flintbay.license.terms` (`/app/EULA.txt`) and
+  `io.flintbay.license.url` point at the [EULA](EULA.txt) that governs the image; earlier images
+  wrongly said `MIT`.
+- Nothing else changes in how Flintbay is configured or run: the same ports, environment
+  variables and volume.
+
+```
+ghcr.io/flintbayhq/flintbay:0.1.11
+index  sha256:130fc3220a968566ef2c329a3dbb8938914d74d3ea85193280441f53c9bc2f44
+amd64  sha256:08ab3e2a8f4e8806c91c3f12b2cc6c158fb4312f6797443799c40b5be7d45c8a
+arm64  sha256:0371829e0e13c6435dac0d0edd4ceda03f99552895488cac0b0a2d6f9865cf9c
+```
 
 ## 0.1.10
 

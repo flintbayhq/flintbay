@@ -116,6 +116,13 @@ if absent, reactivated if disabled, and its password reapplied whenever
 `FLINTBAY_SUPERADMIN_PASSWORD` changes. That last part is the recovery path — lost the
 password, change the variable and restart.
 
+### `FLINTBAY_API_ENABLE_DOCS` no longer does anything
+
+From 0.1.11 the image never serves Swagger UI, ReDoc or `/api/openapi.json`, whatever the
+environment says. Upgrading needs no edit: if the variable is still set, startup logs a warning and
+otherwise ignores it. Remove it from your Compose file to silence the warning. Tooling that fetched
+`/api/openapi.json` from a deployment has to get the schema some other way.
+
 ## Backup Before Upgrade
 
 ```bash
@@ -160,10 +167,10 @@ Pin an explicit version in production:
 ```yaml
 services:
   flintbay:
-    image: ghcr.io/flintbayhq/flintbay:0.1.10
+    image: ghcr.io/flintbayhq/flintbay:0.1.11
 ```
 
-Version tags are immutable: `0.1.10` is never rebuilt or overwritten. For a
+Version tags are immutable: `0.1.11` is never rebuilt or overwritten. For a
 guarantee that survives even a registry mistake, pin the index digest instead:
 
 ```yaml
@@ -171,7 +178,7 @@ guarantee that survives even a registry mistake, pin the index digest instead:
 ```
 
 Resolve the digest for a tag with `docker buildx imagetools inspect
-ghcr.io/flintbayhq/flintbay:0.1.10`. When you pin, update the pin deliberately
+ghcr.io/flintbayhq/flintbay:0.1.11`. When you pin, update the pin deliberately
 whenever a security release is published.
 
 ### Verifying the image
@@ -182,7 +189,7 @@ Each published version is signed with cosign through GitHub OIDC:
 cosign verify \
   --certificate-oidc-issuer https://token.actions.githubusercontent.com \
   --certificate-identity-regexp '^https://github\.com/flintbayhq/flintbay-core/\.github/workflows/build\.yml@' \
-  ghcr.io/flintbayhq/flintbay:0.1.10
+  ghcr.io/flintbayhq/flintbay:0.1.11
 ```
 
 After upgrading, confirm the container is running what you intended:
@@ -190,6 +197,8 @@ After upgrading, confirm the container is running what you intended:
 ```bash
 docker exec flintbay cat /app/release.json
 ```
+
+It reports `version`, the git revision and `protection` — `nuitka` from 0.1.11 on.
 
 ## ARM64 (Jetson / Raspberry Pi)
 
@@ -203,7 +212,7 @@ that flattened the index — check for a mirror or a proxy in front of the
 registry, and confirm the platform with:
 
 ```bash
-docker buildx imagetools inspect ghcr.io/flintbayhq/flintbay:0.1.10
+docker buildx imagetools inspect ghcr.io/flintbayhq/flintbay:0.1.11
 ```
 
 ## Troubleshooting Upgrades

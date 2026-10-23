@@ -67,7 +67,7 @@ right variant for the host, so the same tag works everywhere:
 | **amd64** (x86_64) | Desktop, server, cloud VMs |
 | **arm64** (aarch64) | Jetson Orin/Nano, Raspberry Pi 4/5 |
 
-> A version tag such as `flintbay:0.1.10` is immutable and covers both
+> A version tag such as `flintbay:0.1.11` is immutable and covers both
 > architectures; `latest` moves only when a stable version is published.
 > Pin a version in production — see [upgrading](docs/upgrading.md).
 
@@ -76,7 +76,7 @@ right variant for the host, so the same tag works everywhere:
 | | |
 |---|---|
 | **OS** | 64-bit Linux with Docker Engine and Compose v2. On a Raspberry Pi, use a 64-bit OS — there is no 32-bit (armv7) image |
-| **Memory** | About 400 MiB at idle, all services included (measured: 0.1.6, `edge` profile, MCP on, no Sources). Plan for 1 GB free; video streams, many Sources and open dashboards add to it |
+| **Memory** | About 220 MiB at idle, all services included (measured: 0.1.11 on amd64, `edge` profile, MCP on, no Sources). Plan for 1 GB free; video streams, many Sources and open dashboards add to it |
 | **Disk** | About 320 MB download, 1.3 GB unpacked. A fresh data volume is about 50 MB and grows with audit and connection logs and with backups |
 | **Network** | Port `19580` for the browser. Port `8189` only for low-latency live video |
 | **Browser** | A current Chrome, Edge, Firefox or Safari, on desktop, tablet or phone |
@@ -106,10 +106,10 @@ architecture (`linux/arm64` or `linux/amd64`):
 
 ```bash
 # on a connected machine
-docker pull --platform linux/arm64 ghcr.io/flintbayhq/flintbay:0.1.10
-docker save --platform linux/arm64 ghcr.io/flintbayhq/flintbay:0.1.10 | gzip > flintbay-0.1.10.tar.gz
+docker pull --platform linux/arm64 ghcr.io/flintbayhq/flintbay:0.1.11
+docker save --platform linux/arm64 ghcr.io/flintbayhq/flintbay:0.1.11 | gzip > flintbay-0.1.11.tar.gz
 # on the target
-gunzip -c flintbay-0.1.10.tar.gz | docker load
+gunzip -c flintbay-0.1.11.tar.gz | docker load
 ```
 
 `docker save --platform` requires Docker 28 or later. On older Docker, drop
@@ -162,11 +162,11 @@ upgrade:
 |---|---|
 | Caddy | Serves the web app, API and MCP on port `19580` |
 | Web app | Vue 3 single-page app, served as static files. It runs in the browser, not on the device |
-| API | Python (FastAPI). Runs the connectors, bindings, realtime WebSocket, auth and audit |
+| API | FastAPI, written in Python and shipped compiled to native code. Runs the connectors, bindings, realtime WebSocket, auth and audit |
 | PostgreSQL 17 | Stores workspaces, screens, widgets, sources, bindings, users, audit and logs |
 | Redis | Holds rate limits, lockout counters and short-lived runtime state |
 | MediaMTX | Converts RTSP/RTMP/SRT camera streams into WebRTC (port `8189`) and LL-HLS |
-| MCP server | The `/mcp` endpoint for AI clients. Optional |
+| MCP server | The `/mcp` endpoint for AI clients, shipped compiled to native code. Optional |
 
 PostgreSQL and Redis are embedded and listen only inside the container. You do not install
 them, and their passwords are generated on first start. To use your own servers,
@@ -425,13 +425,8 @@ docker exec flintbay /usr/local/bin/backup.sh
 
 Backups are saved to `/var/lib/flintbay/backups/` (inside the data volume). Old backups are auto-pruned after 7 days.
 
-To restore from a backup:
-
-```bash
-docker exec flintbay bash -c 'gunzip -c /var/lib/flintbay/backups/pg_YYYYMMDD_HHMMSS.sql.gz | \
-  PGPASSWORD=$(cat /var/lib/flintbay/.postgres_password) \
-  /usr/lib/postgresql/17/bin/psql -h localhost -U flintbay -d flintbay'
-```
+To restore, follow [Restore from Backup](docs/upgrading.md#restore-from-backup) — the schema has to
+be cleared first, so a plain `psql` replay into a running database fails.
 
 ## Deployment Administration
 
