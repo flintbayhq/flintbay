@@ -16,8 +16,8 @@ Headings are the bare version, so the anchor for a version is its number without
 Released 2026-10-22.
 
 - Security: the API and MCP server are now compiled to native machine code (Nuitka) for both
-  architectures, replacing PyArmor. No Python source or bytecode ships, and docstrings are
-  stripped, so there is nothing left for a Python decompiler or unpacker to recover.
+  architectures, replacing PyArmor. No Python source or bytecode ships, and the API's explanatory
+  docstrings are stripped, so there is nothing left for a Python decompiler or unpacker to recover.
 - The protection metadata follows: `/app/release.json` reports `"protection": "nuitka"`,
   `/app/protection.json` has profile `nuitka`, and the OCI labels
   `io.flintbay.protection.profile=nuitka` and `io.flintbay.protection.tool=nuitka-4.3.1` replace
